@@ -1,6 +1,6 @@
 # Conceitos importantes sobre JavaScript
 
-#### Trabalhando com arrays em JS
+## Trabalhando com arrays em JS
 Um array (arranjo ou vetor) é um conjunto de dados (que pode assumir os mais diversos tipos, desde do tipo primitivo, a objeto dependendo da linguagem de programação). Arrays são utilizados para armazenar mais de um valor em uma única variável
 
 **Métodos de manipulação de array:**
