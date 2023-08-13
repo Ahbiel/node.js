@@ -1,6 +1,6 @@
 # Conceitos importantes sobre JavaScript
 
-## Trabalhando com arrays em JS
+### Trabalhando com arrays em JS
 Um array (arranjo ou vetor) é um conjunto de dados (que pode assumir os mais diversos tipos, desde do tipo primitivo, a objeto dependendo da linguagem de programação). Arrays são utilizados para armazenar mais de um valor em uma única variável
 
 **Métodos de manipulação de array:**
@@ -162,3 +162,150 @@ O loop **for...in** é mais adequado para objetos, pois ele percorre propriedade
 O loop **for...of** é mais simples e direto para percorrer os elementos de uma coleção. É amplamente utilizado para iterar sobre arrays e outras estruturas iteráveis.
 
 Em resumo, o **for...in** é usado para percorrer as propriedades de objetos, enquanto o **for...of** é usado para percorrer os valores de coleções iteráveis. A escolha entre eles depende da natureza dos dados que você está manipulando e do resultado que deseja alcançar.
+
+##Armazenar dados no navegador:
+- **localStorage.setItem("chave","valor")** -> cria um item no brawser
+  - ou localStorage.chave = "valor"
+- **localStorage.removeItem("chave")** remove este item do brawser
+- **localStorage.getItem("chave")** obtém o valor do item no brawser
+  - pode ser substituído por localStorage.chave
+- verificar se a chave foi criada utilizando um **if(localStorage.key)/else**
+
+### Trabalhando com objetos
+
+Dentro do JavaScript, objetos são estruturas fundamentais que permitem armazenar e organizar dados de maneira flexível e eficiente. Um objeto é uma coleção de pares de chave-valor, em que cada chave é uma string única que identifica um valor associado a ela
+
+1. Notação Literal de Objeto: Você pode criar objetos usando a notação literal, que envolve colocar pares chave-valor entre chaves {}. Por exemplo:
+
+```js
+const pessoa = {
+    nome: "João",
+    idade: 30,
+    profissao: "Engenheiro"
+};
+console.log(pessoa.nome); // Saída: João
+console.log(pessoa['idade']); // Saída: 30
+```
+2. Métodos: Além de propriedades, um objeto também pode conter métodos, que são funções associadas a ele:
+
+```js
+const calculadora = {
+    soma: function(a, b) {
+        return a + b;
+    },
+    subtracao(a, b) {
+        return a - b;
+    }
+};
+
+console.log(calculadora.soma(5, 3)); // Saída: 8
+```
+
+3. Usando o **New object**
+```js
+var restaurantes = new Object();
+restaurantes.entrada = [
+   "frango grelhado",
+   "carne assada",
+]
+valor = "principal"
+restaurantes[valor] = "estrogonofe"
+restaurantes["bebidas"] = [
+   "coca-cola",
+   "pepsi",
+]
+
+
+restaurantes.sobremesa = "sorvete"
+console.log(restaurantes);
+```
+
+4. Funções construtoras:
+
+```js
+function Escola(nota,aluno){
+   this.notas = nota
+   this.nome = aluno
+}
+aluno1 = new Escola(100,"Angelo")
+aluno2 = new Escola(80,"João")
+aluno3 = new Escola(87,"Caio")
+console.log(aluno1,"\n",aluno2,"\n",aluno3);
+```
+
+IMPORTANTE:
+- Dentro de objetos, utilizamos o atributo this para fazer referência ao objeto atual
+- Podemos criar outros objetos e arrays dentro de objetos
+- Podemos criar funções dentro de objetos
+
+### OOP e classes
+
+Programação orientada a objetos (POO ou OOP) é uma coleção de objetos que podem ou não comunicar entre si, ou seja, é um paradigma aplicado na programação que consiste na interação entre diversas unidades chamadas de objetos.
+por meio das classes, eu posso instanciar novos objetos (os objetos são como classes vivas e dinâmicas)
+
+
+Dentro de um objeto, podemos ter:
+- **constructor**: ele é um método que é chamado toda vez que eu instanciar um determinado objeto, ou seja, ele será chamado durante a criação do objeto de uma determinada classe, podemos passar parâmetros para a classe e executar determinadas validações ou funções dentro desse contexto.
+- **this**: trata-se do próprio escopo atual onde o mesmo está sendo referenciado, é usado para referenciarmos a própria classe (tratando-se apenas de OO) dentro de funções ou métodos.
+
+```js
+class Carro{ //criar uma classe chamada carro
+   constructor(){ 
+       this.cor = vermelho
+       console.log(this.cor)
+   }
+}
+let c1 = new Carro() //vou instanciar o objeto dessa classe
+let c2 = new Carro() //o que eu fizer com uma instância, só se aplica a esta instância, e não a outras
+//nesse exemplo, o método constructor será chamado duas vezes
+
+//preciso usar o this para fazer referências às instâncias, se não será uma variável do método constructor
+```
+Outro exemplo de um POO:
+```js
+class Carro{
+	constructor(c){
+		this.cor=c
+		console.log(this.cor)
+	}
+}
+let c1=new Carro("vermelho")
+let c2=new Carro("preto")
+```
+
+### Métodos de um OOP:
+
+Além do método constructor, eu consigo criar outros métodos dentro de uma classe, porém, diferente do método constructor, os outros métodos é necessário ser chamado para ser executado
+
+- **setter (set)**: serve para atribuir ou alterar valores dos atributos do objeto; esse método obrigatoriamente precisa de um parâmetro
+```js
+class Carro{
+	constructor(c){
+		this.cor=c
+	}
+    set mudar(v){ 
+        this.cor = v
+    }
+}
+let c1=new Carro("vermelho")
+let c2=new Carro("preto")
+c2.mudar = "Amarelo"
+console.log(c1.cor) //vermelho
+console.log(c2.cor) //amarelo
+```
+- **getter (get)**: pega o retorno de algum valor dentro da classe
+
+```js
+class Carro{
+	constructor(c){
+		this.cor=c
+	}
+    get readNovo(){
+        return `${this.cor}`
+    }
+}
+let c1=new Carro("vermelho")
+let c2=new Carro("preto")
+console.log(c1.readNovo)
+console.log(c2.readNovo)
+```
