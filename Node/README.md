@@ -36,3 +36,13 @@ São funcionalidades mais modernas de importação e exportação, com mais recu
 Para isso precisamos modificar os nossos arquivos para a extensão **.mjs**.
 E então podemos exportar uma com **export default** e importar com **import**, uma única função, caso seja necessário;
 
+## sync e async
+Em Node.js temos duas opções ao executar métodos, conhecidas como sync (síncrona) e async (assíncrona:):
+- **Forma síncrona**: o código espera ser totalmente executado para prosseguir;
+- **Forma assíncrona:** o código continue progredindo e em um ponto futuro obtém a resposta da execução assíncrona;
+
+## Lidando com erros em Node
+
+Temos duas formas principais para gerar ou evidenciar erros em Node.js;
+- **throw:** uma forma de encerrar um programa, gerando um novo erro;
+- **try catch:** uma forma de evidenciar algo que deu errado em um bloco de código e exibir a mensagem de erro;

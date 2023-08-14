@@ -309,3 +309,134 @@ let c2=new Carro("preto")
 console.log(c1.readNovo)
 console.log(c2.readNovo)
 ```
+
+## Promise:
+
+As Promises (Promessas) proporcionam uma maneira mais eficiente e estruturada de lidar com operações assíncronas, como chamadas de **API**, **leitura/gravação de arquivos** e outras tarefas que **não podem ser executadas imediatamente**. 
+Basicamente, as Promises tornam um código **síncrono** em um código **assíncrono** (o processamento síncrono é aquele que acontece em sequência e ordenado, seguindo uma fila, e o outro processamento assíncrono só começa após o atual ser concluído.)
+
+Uma Promise representa uma operação que está em andamento ou foi concluída, mas cujo resultado pode não estar disponível imediatamente. Ela pode estar em um dos três estados:
+- **Pending (Pendente):** O estado inicial, onde a Promise ainda está em andamento e aguardando um resultado.
+- **Fulfilled (Cumprida):** A operação foi concluída com sucesso e o resultado está disponível. Nesse caso, a Promise passa para o estado "cumprida" e chama a função de retorno (resolve) que você especificou ao criar a Promise.
+- **Rejected (Rejeitada):** A operação falhou e o resultado não está disponível. A Promise entra no estado "rejeitado" e chama a função de retorno (reject) que você definiu ao criar a Promise.
+
+Temos também os retornos das promessas, são elas:
+- **.then:** retornar o resolve se o código executou corretamente
+- **.catch:** retorna o erro caso o programa não tenha sido executado corretamente
+
+
+1. Exemplos
+
+```js
+var testar = new Promise((res,rej)=>{
+   let x = 130
+   if(x==10){
+       res("sucesso")
+   }
+   else{
+       rej("ERRO")
+   }
+})
+testar
+    .then(sucesso=>console.log(sucesso))
+   	.catch(erro =>console.log(erro))
+```
+
+2. exemplo
+
+```js
+const getTaxAmount = (price, taxRate) => {
+   return Promise.resolve(Math.floor((price*taxRate) / 100))
+};
+getTaxAmount(100, 12).then((taxAmount) => console.log(taxAmount));
+```
+
+3. exemplo
+
+```js
+const fetchUserData = (userId) => {
+  return new Promise((resolve, reject) => {
+    // Simulando uma chamada assíncrona, por exemplo, uma requisição HTTP
+    setTimeout(() => {
+      if (userId === 1) {
+        resolve({ id: 1, name: 'Usuário' });
+      } else {
+        reject('Usuário não encontrado');
+      }
+    }, 1000);
+  });
+};
+
+// Usando a Promise
+fetchUserData(1)
+  .then(user => {
+    console.log('Dados do usuário:', user);
+  })
+  .catch(error => {
+    console.error('Erro:', error);
+  });
+```
+
+Na prática, não usamos muito o **new Promise**, pois nesse caso, estamos criando nossas próprias promessas. Na prática usamos muito mais promessas prontas como é o caso de requisições de APIs, na qual usamos o **.then** e o **.catch** normalmente, como no exemplo abaixo:
+
+```js
+const fetchPromise = fetch('https://mdn.github.io/learning-area/javascript/apis/fetching-data/can-store/products.json');
+
+console.log(fetchPromise);
+fetchPromise.then((resposta) => {
+ console.log(`Resposta recebida: ${resposta.status}`);
+});
+console.log("Requisição iniciada…");
+```
+
+
+## Async e Await
+
+O async/await fornece uma maneira mais simples e síncrona de lidar com operações assíncronas, tornando o código assíncrono mais parecido com o código síncrono tradicional.
+
+O async/await é construído sobre o conceito de Promises e permite que você escreva código assíncrono de maneira mais linear, como se estivesse escrevendo código síncrono. Ele consiste em dois componentes principais:
+- **Async Functions (Funções Assíncronas):** Uma função marcada como async automaticamente retorna uma Promise. Isso permite que você use o await dentro dessa função para pausar a execução até que uma Promise seja cumprida ou rejeitada. As funções assíncronas são ideais para encapsular operações assíncronas e tratá-las de maneira mais natural.
+- **Await Operator (Operador Await):** O operador await é usado dentro de uma função assíncrona para aguardar o resultado de uma Promise. Ele pausa a execução da função até que a Promise seja cumprida, permitindo que você continue a execução do código de forma síncrona. Isso ajuda a evitar aninhamento excessivo de callbacks e torna o código mais legível.
+
+
+1. exemplo:
+
+```js
+const loop = new Promise((res)=>{
+   setTimeout(()=>{
+       console.log("Hello world");
+       res()
+   },3000)
+})
+async function wait(){
+   await loop
+   console.log("Olá mundo")
+}
+wait()
+```
+
+2. exemplo:
+
+```js
+function fetchData() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('Dados obtidos com sucesso');
+    }, 1000);
+  });
+}
+
+async function main() {
+  try {
+    const result = await fetchData();
+    console.log(result);
+  } catch (error) {
+    console.error('Erro:', error);
+  }
+}
+
+main();
+```
+
+
+Função de callback
