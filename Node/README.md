@@ -78,3 +78,6 @@ O resultado da chamada à função parse é armazenado na variável urlInfo. Ess
 - **pathname:** O caminho da URL após o host.
 - **query:** Um objeto JavaScript contendo os parâmetros de consulta da URL (disponível somente quando o segundo argumento da função parse é true).
 
+# Seção 4 - Fundamentos do npm
+
+## O que npm?

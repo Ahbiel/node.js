@@ -7,7 +7,7 @@ const port = 3000
 const server = http.createServer((req, res) => {
   var q = url.parse(req.url, true)
   var filename = q.pathname.substring(1)
-
+    console.log(filename) //index.html
   if (filename.includes('html')) {
     if (fs.existsSync(filename)) {
       fs.readFile(filename, function (err, data) {
