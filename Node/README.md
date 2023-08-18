@@ -130,6 +130,11 @@ server.listen(port, () =>{
 })
 ```
 
+Na nova versão do Js, a instrução require está caindo em desuso - alguns pacotes novos estão substituindo pelo import/export, como é o exemplo do inquirer. Como boas práticas, iremos também adotar esse método, porém, a algumas configurações que precisamos realizar para poder efetuar o uso do import/export sem erro. Após criarmos o aruqivo package.json com o comando **npm init -y**, vamos editar o arquivo da seguinte forma:
+- Adcionar **"type": "module"** ao arquivo package.json.
+- Trocar a instrução **"main": "index.js"** pelo **"exports": "./index.js"** no arquivo package.json.
+
+Link: https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c
 
 Seção 4 - Fundamentos do npm
 
@@ -186,3 +191,4 @@ A principal função do npx é permitir que você execute comandos de pacotes in
 ●Substituindo <nome> pelo nome do pacote;
 ●Isso faz com que o pacote seja removido do package.json também;
 ●Vamos ver na prática!
+

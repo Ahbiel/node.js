@@ -1,0 +1,17 @@
+{
+  "name": "4_projeto_banco",
+  "version": "1.0.0",
+  "description": "Digitar o **npm init -y**",
+  "exports": "./index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "inquirer": "^9.2.10"
+  }
+}
