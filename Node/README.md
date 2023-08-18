@@ -130,6 +130,8 @@ server.listen(port, () =>{
 })
 ```
 
+## Utilizando o import/export
+
 Na nova versão do Js, a instrução require está caindo em desuso - alguns pacotes novos estão substituindo pelo import/export, como é o exemplo do inquirer. Como boas práticas, iremos também adotar esse método, porém, a algumas configurações que precisamos realizar para poder efetuar o uso do import/export sem erro. Após criarmos o aruqivo package.json com o comando **npm init -y**, vamos editar o arquivo da seguinte forma:
 - Adcionar **"type": "module"** ao arquivo package.json.
 - Trocar a instrução **"main": "index.js"** pelo **"exports": "./index.js"** no arquivo package.json.
@@ -187,8 +189,83 @@ npm install -g _pacote_
 A principal função do npx é permitir que você execute comandos de pacotes instalados, que normalmente não seriam acessíveis diretamente pela linha de comando. Ele é especialmente útil para executar utilitários de linha de comando fornecidos por pacotes npm sem a necessidade de instalá-los previamente. Como por exemplo a instalação do React, que é feita pelo npx;
 
 ## Remover pacote com npm
-●Para remover um pacote utilizamos o comando: npm uninstall <nome>
-●Substituindo <nome> pelo nome do pacote;
-●Isso faz com que o pacote seja removido do package.json também;
-●Vamos ver na prática!
+Para remover um pacote utilizamos o comando: **npm uninstall _Pacote_**. Isso faz com que o pacote seja removido do package.json também;
+
+# Express
+O Express é um framework para Node.js muito utilizado, que serve para criarmos aplicações web. Nele podemos _criar rotas_, renderizar HTML, conectar a um banco de dados, entre outros.
+
+Principais recursos e funcionalidades do Express.js:
+
+- **Roteamento**: O Express.js oferece um sistema de roteamento flexível e poderoso que permite mapear URLs para funções de manipulação de solicitações. Isso permite que você defina facilmente as rotas para diferentes partes do seu aplicativo.
+- **Middlewares**: Os middlewares são funções intermediárias que podem ser usadas para processar solicitações antes que elas atinjam as rotas finais. Eles são úteis para a execução de ações comuns a várias rotas, como autenticação, manipulação de erros e muito mais.
+  - Middlewares são códigos que podem ser executados no meio/entre (middle) de alguma ação e outra.
+  - Por exemplo: verificar se usuário está logado, podemos ter um para esta verificação;
+  - O método que nos dá acesso a utilizar middlwares é o use no Express
+```js
+const express = require('express');
+const app = express();
+
+// Middleware de logging
+app.use((req, res, next) => {
+  console.log(`Solicitação recebida para: ${req.url}`);
+  next(); // Passa o controle para o próximo middleware/rota
+});
+
+// Rota
+app.get('/', (req, res) => {
+  res.send('Olá, mundo!');
+});
+
+app.listen(3000, () => {
+  console.log('Servidor iniciado na porta 3000');
+});
+```
+- **Gerenciamento de Solicitação e Resposta**: O Express.js simplifica a manipulação de solicitações HTTP e respostas, fornecendo métodos e ferramentas para configurar cabeçalhos, definir códigos de status e enviar dados para o cliente.
+- **Integração com Middleware de Terceiros:** O Express.js possui uma ampla gama de middlewares de terceiros disponíveis que facilitam a integração de recursos adicionais em seu aplicativo, como autenticação, compactação de respostas, sessões, entre outros.
+- **Suporte a Modelos de Visualização:** Embora o Express.js não inclua um mecanismo de modelo de visualização integrado, ele permite que você escolha e integre facilmente mecanismos de modelos populares, como Handlebars, EJS e Pug.
+
+**O que são rotas**
+
+Rota é um conceito super importante e presente em aplicações web. basicamente são as URL’s que acessamos. Se criamos uma rota **/produtos**, podemos acessar através da URL **www.nossosite.com/produtos**. Quando o usuário acessa podemos acessar várias lógicas, como carregar produtos do banco de dados. Ou seja, rotas são uma ponte entre o usuário e a lógica da aplicação.
+
+
+**Passo-à-passo** da utilização do Express
+
+- Importar o Express e invocá-lo;
+```js
+const express = require('express')
+const app = express()
+```
+- Definir uma porta base para a aplicação;
+```js
+const port = 3000 // pode ser passado variáveis de ambiente
+```
+- Criar uma rota (URL que será acessada);
+```js
+app.get("/", (req,res)=>{ //nesse caso, a rota é a raiz do projeto (/)
+    res.send('<h2>Hello world</h2>')
+})
+```
+- Executar o método listen na porta especificada;
+```js
+app.listen(port, () =>{
+    console.log(`App rodando na porta ${port}`)
+})
+```
+
+## Renderizando html com o express e o Path
+
+Para enviar HTML como resposta do usuário, utilizamos o método **sendFile**. Para que não ocora nenhum erro, nesse primeiro momento, precisamos passar o path absoluto do arquivo html para o sendFile, e para isos, vamos utilizar método **join** o core Module **path**, passando o path absoluto com a variável de ambiente **__dirname**
+```js
+import path from 'path'
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const basePath = path.join(__dirname,"dir_do_html")
+app.get('/',(req,res)=>{
+  res.sendFile(`${basePath}/index.html`)
+})
+```
+
 
