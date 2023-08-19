@@ -268,4 +268,78 @@ app.get('/',(req,res)=>{
 })
 ```
 
+## Parâmetros por URL
 
+Podemos resgatar os parâmetros da URL por meio do **req**. Acessamos **req.params _nome_**, onde nome deve ser o que está definido na URL do Express; que fica desta forma: **/users/:id**. Neste caso estaríamos buscando o usuário no banco de dados pelo id;
+
+## Enviando dados por POST
+
+Para enviar os dados vamos precisar criar um form e mandar os dados via POST para alguma URL. No Express precisamos colocar alguns middlewares como o express.json para ler os dados do body. E também uma roda que vai receber estes dados, utilizando o método post do Express;
+
+middlewares que podemos utilizar
+- Criando um próprio middlewares
+```js
+app.use(
+    express.urlencoded({
+      extended: true,
+    }),
+)
+app.use(express.json())
+```
+- **app.use(...):** O método use() é usado para adicionar middlewares ao aplicativo Express. Middlewares são funções que podem manipular as requisições HTTP enquanto passam pelo pipeline do aplicativo. Eles podem realizar diversas tarefas, como analisar corpos de requisição, autenticar usuários, manipular cabeçalhos e muito mais.
+- **express.urlencoded({...}):** Este middleware é usado para analisar os corpos das requisições HTTP com o tipo de conteúdo application/x-www-form-urlencoded. Esse tipo de conteúdo é comum em formulários HTML tradicionais. O middleware urlencoded é responsável por analisar os dados enviados pelo cliente no corpo da requisição e transformá-los em um formato que o servidor possa entender. O objeto de configuração { extended: true } permite que esse middleware analise dados mais complexos, como arrays e objetos aninhados, em vez de apenas dados simples.
+- **app.use(express.json()):** Este middleware é usado para analisar os corpos das requisições HTTP com o tipo de conteúdo application/json. Esse tipo de conteúdo é amplamente utilizado para enviar dados em formato JSON (JavaScript Object Notation), que é um formato de intercâmbio de dados muito comum em APIs REST. O middleware json analisa o corpo da requisição, se estiver no formato JSON, e transforma-o em um objeto JavaScript que pode ser manipulado facilmente no servidor.
+
+Importando um middlewares
+```js
+const bodyParser = require('body-parser'); // Middleware para lidar com dados do corpo das requisições
+app.use(bodyParser.json());
+```
+
+## Rotas
+
+O **express.Router** é uma classe no framework Express.js que permite criar roteadores modulares para organizar e separar suas rotas em módulos independentes. Ele oferece uma maneira flexível de gerenciar suas rotas em aplicativos Express, tornando seu código mais organizado e fácil de manter.
+
+Podemos unir várias rotas em um módulo, isso vai deixar nosso código mais organizado. Normalmente criamos uma pasta ou arquivo que contém estas rotas.
+
+Vantagens:
+- **Modularização de Rotas:** O express.Router permite criar um conjunto de rotas separadas em arquivos diferentes, dividindo a lógica do roteamento em módulos independentes. Isso é especialmente útil em aplicativos maiores, onde você pode ter muitas rotas e deseja manter seu código organizado.
+- **Criação e Configuração:** Você pode criar um roteador utilizando o método express.Router(). A partir daí, você pode definir rotas usando os métodos HTTP como get, post, put, delete, etc., assim como faria no aplicativo principal do Express.
+- **Middleware**: Assim como no aplicativo principal, você pode adicionar middlewares ao roteador usando router.use(...). Isso permite que você aplique middlewares específicos para determinadas rotas ou para todo o roteador.
+- **Montagem no Aplicativo:** Depois de definir as rotas em um roteador, você pode montá-lo em um aplicativo Express usando app.use(...). Isso faz com que todas as rotas definidas no roteador estejam disponíveis sob o caminho especificado.
+- **Parâmetros e Controladores:** O express.Router também suporta o uso de parâmetros em rotas, permitindo que você capture valores específicos das URLs. Além disso, você pode usar funções de controle (controllers) para separar ainda mais a lógica de negócios das rotas em si.
+- **Reusabilidade:** A modularidade oferecida pelo express.Router torna mais fácil reutilizar rotas em diferentes partes do aplicativo ou até mesmo em diferentes aplicativos.
+
+Exemplo:
+
+```js
+// routes/posts.js
+const express = require('express');
+const router = express.Router();
+
+router.get('/', (req, res) => {
+  res.send('Lista de posts');
+});
+
+router.get('/:id', (req, res) => {
+  const postId = req.params.id;
+  res.send(`Detalhes do post ${postId}`);
+});
+
+module.exports = router;
+```
+
+```js
+// app.js
+const express = require('express');
+const app = express();
+
+const postsRouter = require('./routes/posts');
+
+app.use('/posts', postsRouter);
+
+app.listen(3000, () => {
+  console.log('Servidor rodando na porta 3000');
+});
+
+```
