@@ -343,3 +343,94 @@ app.listen(3000, () => {
 });
 
 ```
+
+# Seção 7 - Template engine
+
+Uma template engine no Node.js é uma ferramenta que permite que você combine dados dinâmicos com templates estáticos para gerar conteúdo HTML de forma mais eficiente e organizada. Em outras palavras, é uma biblioteca que ajuda a separar a lógica de apresentação do seu código, facilitando a criação de páginas da web dinâmicas.
+
+Basicamente é uma forma de deixar o HTML dinâmico, inserindo variáveis do back-end no front-end. Podemos também criar layouts, que são reaproveitados, o que é essencial para projetos que usam banco de dados, que não são estáticos;
+
+Algumas das template engines populares no ecossistema Node.js incluem:
+
+- **EJS (Embedded JavaScript):** Permite que você insira código JavaScript diretamente em seus templates HTML. Os pedaços de código JavaScript são interpretados e executados no servidor, gerando o conteúdo dinâmico.
+- **Handlebars**: Usa um sistema de expressões delimitadas por chaves duplas {{}} para inserir dados nas templates. Ele é mais focado em simplicidade e legibilidade.
+- **Pug (anteriormente conhecido como Jade):** Oferece uma sintaxe compacta e de estilo mais próximo ao Markdown. Ele é ideal para quem procura uma maneira mais concisa de escrever templates.
+- **Nunjucks:** Inspirado no Jinja2 do Python, ele fornece uma ampla gama de funcionalidades para controle de fluxo, herança de templates e reutilização de blocos.
+- **Mustache:** Uma engine de template minimalista que foca em simplicidade e legibilidade. É bastante flexível e está disponível em várias linguagens de programação.
+
+Todos atingem o mesmo objetivo, porém há algumas diferenças de setup e funcionalidades;
+
+## O que é Handlebars 
+
+O Handlebars é uma das template engines mais utilizadas, e colocamos os dados dinâmicos no HTML entre {{ }} para serem impressos. Podemos criar condicionais e também loops no template. Conhecido pela sua sintaxe limpa no front, nos força a não executar lógica no HTML. Utilizamos o método **render** para enviar esta view para a requisição, e não mais o **send** ou **sendFile**
+
+O nome do pacote é express-handlebars;
+
+Exemplo utilizando o Handlebars:
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{pageTitle}}</title>
+</head>
+<body>
+  <h1>Bem-vindo, {{username}}!</h1>
+  <ul>
+    {{#each items}}
+      <li>{{this}}</li>
+    {{/each}}
+  </ul>
+</body>
+</html>
+```
+
+## Instalando e utilizando o Handlebars
+```bash
+npm install nodemon express express-handlebars
+```
+No index precisamos importar os pacotes instalados, e também adicionar ao Express a engine do Handlebars. Criaremos uma view no diretório views, com a extensão handlebars;
+
+```js
+// index.js
+import express from 'express'
+import exphbs from 'express-handlebars'
+
+const app = express()
+
+app.engine('handlebars', exphbs.engine())
+app.set('view engine', 'handlebars')
+
+app.get('/',(req, res)=>{
+    res.render('home',{layout:false})
+})
+app.listen(3000)
+```
+
+- **app.engine('handlebars', exphbs.engine()):** define o mecanismo de template Handlebars para o Express. Isso indica que, quando você renderiza um arquivo com a extensão .handlebars, o Express usará o mecanismo Handlebars para processar o template.
+- **app.set('view engine', 'handlebars'):** define o mecanismo de visualização padrão como Handlebars. Isso informa ao Express que ele deve usar o mecanismo Handlebars ao renderizar arquivos com extensão .handlebars.
+- **res.render('home', { layout: false }):** renderiza um arquivo de template chamado 'home' (assumindo que existe um arquivo 'home.handlebars') usando o mecanismo de template Handlebars. O segundo argumento { layout: false } é um objeto de contexto que é passado para o template. Neste caso, ele define a opção de layout como falso, o que significa que nenhum layout padrão será aplicado ao template.
+
+Agora, vamos precisar criar um diretório **views** no na raiz do nosso projeto, com o nome **home.handlebars** 
+
+## Criando layout
+
+Dentro da template engine Handlebars, você pode criar layouts para estruturar o conteúdo das suas páginas da web de maneira consistente e reutilizável. Layouts permitem que você defina uma estrutura comum que envolve diferentes páginas, mantendo partes compartilhadas como cabeçalhos, rodapés e menus consistentes em todas as páginas do seu site ou aplicativo.
+
+Vamos criar uma pasta chamada layouts em views, e nela criamos o template que será repetido. Colocamos uma tag especial {{{ body }}}, Para que neste local o ‘corpo’ do site seja inserido. Em todas as nossas views agora o layout é repetido;
+
+## Passando dados para a view
+
+Vamos passar os dados por meio do método **render**. Enviamos um objeto com chaves e valores, e isso nos possibilita acessar estes dados no template. Vamos utilizar a sintaxe de {{ dado }} e o dado será impresso!
+
+## Utilizando condicionais
+
+Utilizar uma estrutura condicional nos permite mais flexibilidade no layout. Podemos utilizar o if no Handlebars. A sintaxe é: {{#if algumacoisa }} ... {{/if }}. Só imprime o que está entre as condicionais, se o resultado dela for verdadeiro.
+```html
+{{#if auth}}
+<p>
+  Você está autenticado no sistema, <a href="/dashboard">clique aqui</a> para acessar a área de membros
+</p>
+{{/if}}
+```
+
+O else é um complemento do if. Utilizamos no Handlebars para a exibição de outra parte do layout, caso a condição seja falsa, isso nos dá mais flexibilidade ainda. A sintaxe é: {{#if alguma coisa}} ... {{else }} ... {{#/if }}

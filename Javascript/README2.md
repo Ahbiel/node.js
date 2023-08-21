@@ -163,7 +163,7 @@ O loop **for...of** é mais simples e direto para percorrer os elementos de uma 
 
 Em resumo, o **for...in** é usado para percorrer as propriedades de objetos, enquanto o **for...of** é usado para percorrer os valores de coleções iteráveis. A escolha entre eles depende da natureza dos dados que você está manipulando e do resultado que deseja alcançar.
 
-##Armazenar dados no navegador:
+## Armazenar dados no navegador:
 - **localStorage.setItem("chave","valor")** -> cria um item no brawser
   - ou localStorage.chave = "valor"
 - **localStorage.removeItem("chave")** remove este item do brawser
