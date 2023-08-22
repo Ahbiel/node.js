@@ -448,3 +448,61 @@ sempre ao objeto antes. A sintaxe é: {{#with objeto}} ... {{/with}}. Desta mane
 
 A inclusão de CSS no Handlebars é muito semelhante a que realizamos apenas com Express. Precisamos definir a pasta dos arquivos estáticos, e vamos linkar o CSS com o nosso layout em comum para todas as
 páginas. Isso torna possível a estilizar os nossos projetos;
+
+# Seção 8 Node.js com MySql
+
+O MySQL é um SGBD (Sistema Gerenciador de Banco de Dados) que vai nos ajudar a trabalhar com bancos relacionais
+- Os bancos de dados relacionais são constituídos por algumas entidades;
+  - **Banco de dados:** Um banco para guardar os dados do projeto;
+  - **Tabelas:** Onde categorizamos os dados e os inserimos;
+  - **Colunas:** Onde separamos os dados em uma tabela;
+  - **Dados:** O que é inserido, modificado, atualizado e removido em uma tabela;
+  - **Relacionamentos:** Ligações entre as tabelas;
+
+Também é o mais utilizado atualmente em sistemas e aplicações. Muitos projetos de Node.js utilizam MySQL. Precisamos instalar o software e deixar ele em execução para que o node possa se conectar aos bancos que temos disponíveis.
+
+## instalação do MySql no linux
+
+A instalação será feita via terminal, executando os serguintes comandos:
+
+```sh
+sudo apt install -y mysql-server #instala o mysql
+sudo mysql_secure_installation # inicia os protocolos de segurança para a instalação do mysql
+systemctl status mysql.service # Visualiza se o serviço está mesmo ativo
+sudo mysql -u root # Estabelece uma conexão com o MySql
+
+# Uma vez logado
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Ab123456';
+```
+
+Nesse caso, todo o gerenciamento do banco de dados será feito através do terminal, porem, temos a possibilidade de usar softwares para o gerenciamento do MySql por meio de uma interface gráfica:
+- workbench
+- HeidiSQL
+- DBeaver-ce
+
+## Integração do MySQL e Node.js
+
+Primeiramente vamos precisar instalar o driver, que é um pacote chamado **mysql**, e vamos instalá-lo com o **npm**! Depois precisamos conectar ao nosso banco de dados, inserindo informações como: **host, user, password e o banco.**
+
+Criando conexão com o MySql
+
+```js
+const conn = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "Ab123456",
+    database: "nodeapp"
+})
+
+conn.connect((err)=>{
+    if(err){
+        console.log(err)
+    }
+    console.log("Conectou ao MySql")
+    app.listen(port)
+
+})
+```
+
+- **const conn = mysql.createConnection({ ... }):** Aqui, um objeto de configuração para a conexão com o banco de dados MySQL é criado usando o método createConnection do módulo mysql. O objeto de configuração especifica o host do banco de dados, nome de usuário, senha e o nome do banco de dados a ser conectado.
+- **conn.connect((err) => { ... }):** Esta é a função que tenta estabelecer uma conexão com o banco de dados usando a configuração fornecida. Ela recebe uma função de retorno de chamada que é executada após a tentativa de conexão. Se um erro ocorrer durante a conexão, o parâmetro err conterá informações sobre o erro e a função de retorno de chamada será chamada. Se não houver erros, a função de retorno de chamada não receberá nenhum parâmetro.
