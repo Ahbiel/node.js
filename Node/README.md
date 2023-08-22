@@ -434,3 +434,17 @@ Utilizar uma estrutura condicional nos permite mais flexibilidade no layout. Pod
 ```
 
 O else é um complemento do if. Utilizamos no Handlebars para a exibição de outra parte do layout, caso a condição seja falsa, isso nos dá mais flexibilidade ainda. A sintaxe é: {{#if alguma coisa}} ... {{else }} ... {{#/if }}
+
+## Estrutura de Repetição
+
+As estruturas de repetição no Handlebars são feitas pelo operador **each**. A sintaxe é {{#each }} ... {{/each }} (semelhante ao if/else). Em um array podemos chamar os itens com: {{this }},Então cada um dos itens é acessado na view. Como o Handlebars prega um template mais limpo, devemos mandar apenas o necessário para o front-end;
+
+## Utilizando o with
+
+O with nos permite abstrair um objeto, ou seja, podemos acessar as propriedades sem nos referenciarmos
+sempre ao objeto antes. A sintaxe é: {{#with objeto}} ... {{/with}}. Desta maneira nossa código fica ainda mais simples.
+
+## CSS com Handlebars e Express
+
+A inclusão de CSS no Handlebars é muito semelhante a que realizamos apenas com Express. Precisamos definir a pasta dos arquivos estáticos, e vamos linkar o CSS com o nosso layout em comum para todas as
+páginas. Isso torna possível a estilizar os nossos projetos;

@@ -1,0 +1,20 @@
+<h2>{{mensagem}}</h2>
+<p>Meu nome é {{info.nome}} e tesnho {{info.age}} anos de idade</p>
+{{#if auth}}
+<p>
+  Você está autenticado no sistema, <a href="/dashboard">clique aqui</a> para acessar a área de membros
+</p>
+<ul>
+  {{#each list}}
+    <li>- {{this}}</li>
+  {{/each}}
+</ul>
+
+
+{{else}}
+<p>
+  Você não esta autenticado no sistema
+</p>
+
+
+{{/if}}
