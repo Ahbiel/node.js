@@ -473,6 +473,8 @@ sudo mysql -u root # Estabelece uma conexão com o MySql
 
 # Uma vez logado
 ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Ab123456';
+CREATE DATABASE nodeapp;
+SHOW DATABASES
 ```
 
 Nesse caso, todo o gerenciamento do banco de dados será feito através do terminal, porem, temos a possibilidade de usar softwares para o gerenciamento do MySql por meio de uma interface gráfica:
@@ -506,3 +508,119 @@ conn.connect((err)=>{
 
 - **const conn = mysql.createConnection({ ... }):** Aqui, um objeto de configuração para a conexão com o banco de dados MySQL é criado usando o método createConnection do módulo mysql. O objeto de configuração especifica o host do banco de dados, nome de usuário, senha e o nome do banco de dados a ser conectado.
 - **conn.connect((err) => { ... }):** Esta é a função que tenta estabelecer uma conexão com o banco de dados usando a configuração fornecida. Ela recebe uma função de retorno de chamada que é executada após a tentativa de conexão. Se um erro ocorrer durante a conexão, o parâmetro err conterá informações sobre o erro e a função de retorno de chamada será chamada. Se não houver erros, a função de retorno de chamada não receberá nenhum parâmetro.
+
+## Criando tabelas no bando de dados criado
+
+Vamos criar uma tabela simples com 3 colunas: id, title e quantidade de páginas, como no exemplo abaixo
+
+```Sql
+CREATE TABLE nodeapp.books (
+    id INT auto_increment NOT NULL,
+    title varchar(255) NULL,
+    pageqty INT NULL,
+    PRIMARY KEY (id)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_0900_ai_ci;
+```
+
+## Inserindo dados através do Node.js
+
+Para inserir dados no banco vamos precisar criar e executar uma **query** fazendo o uso da instrução **INSERT**. A query em si é uma **string**, seguindo os padrões do MySQL. Já para executar vamos utilizar o método query do pacote mysql;
+
+```js
+app.post('/books/insertbook',(req,res)=>{
+    const {title, pageqty} = req.body
+    console.log(title,pageqty)
+
+    const query = `INSERT INTO books (title, pageqty) VALUES ('${title}','${pageqty}')`
+    conn.query(query, (err)=>{
+        if(err){
+            console.log(err)
+        }
+        res.redirect('/')
+    })
+})
+```
+
+## Resgatando os dados utilizando o Node.js
+
+Para resgatar dados vamos precisar criar uma query, que será um **SELECT**. Podemos escolher quais dados são retornados, determinando as colunas, e podemos imprimi-los nas nossas views.
+
+```js
+app.get('/book',(req,res)=>{
+    const query = "SELECT * FROM books"
+    conn.query(query, (err,data)=>{
+        if(err){
+            console.log(err)
+        }
+        const book = data
+        // console.log(book)
+        res.render('book', {book})
+    })
+})
+```
+
+Podemos tembém resgatar um dado específico utilizando a instrução **WHERE**. Desta maneira conseguimos filtrar por uma coluna e um valor, como por exemplo: achar os livros através do ID
+
+```js
+app.get('/book/:id',(req,res)=>{
+    const id = req.params.id
+    const query = `SELECT * FROM books WHERE id = ${id}`
+    conn.query(query, (err,data)=>{
+        if(err){
+            console.log(err)
+        }
+        const book = data
+        res.render('book', {book})
+    })
+})
+```
+
+## Atualizando dados
+
+Para editar algum dado temos antes alguns preparos a realizar:
+- Primeiramente vamos resgatar os dados **(SELECT)**
+- E normalmente preenchemos o formulário de dados com os dados que foram resgatados **(WHERE)**;
+- Isso faz com que o usuário lembre dos dados cadastrados e possa escolher o que editar
+- Precisamos criar uma nova rota como POST.
+  - Isso porque o navegador só consegue interpretar dois verbos atualmente **(GET ou POST)**
+- E então faremos uma query de **UPDATE** para processar a atualização;
+  - Note que precisamos passar o id do livro neste formulário também, onde nesse caso podemos passar um input do tipo hidden com o valor do ID
+
+```js
+app.post("/books/updatebook",(req,res)=>{
+  const {id,title,pageqty} = req.body
+  console.log(id,title,pageqty) 
+  const query = `UPDATE books SET title = '${title}', pageqty = '${pageqty} id = ${id}'`
+  conn.query(query,(err)=>{
+      if(err){
+          console.log(err)
+          reutnr
+      }
+      res.redirect('/book/edit/:id')
+  })
+})
+```
+
+## Apêndice: Comandos iniciais no MySql
+
+Comandos dentro do MySQL
+
+- **CREATE DATABASE nome_do_banco;** -> cria um banco de dados
+- **SHOW DATABASES;** -> lista os bancos de dados
+- **USE nome_do_banco;** -> selecionar um banco de dados em específico
+- **DROP DATABASE database_name;** -> exclui um database
+- **CREATE TABLE nome_da_tabela (coluna1 tipo1, …);** -> Cria uma tabela
+- **SHOW TABLES;** -> lista todas as tabelas
+- **DESCRIBE nome_da_tabela;** -> exibe a estrutura de uma tabela
+- **INSERT INTO nome_da_tabela (coluna1, ...) VALUES (valor1, ...);** -> Insere dados em uma tabela
+- **SELECT * FROM nome_da_tabela;** seleciona todos os dados de uma tabela
+- **DELETE FROM nome_da_tabela WHERE condição;** -> Excluir dados de uma tabela (ex: delete from cadastro where nome=’angelo’; )
+- **UPDATE nome_da_tabela SET coluna1 = valor1, coluna2 = valor2, ... WHERE condição;** -> Atualizar dados em uma tabela
+- **DROP TABLE nome_da_tabela;** -> exclui uma tabela
+- **SHOW STATUS;** -> Exibe informações sobre o servidor
+
+Os arquivos do MySql ficam no diretório **/var/lib/mysql**
+

@@ -1,0 +1,6 @@
+<h1>Livros disponíveis:</h1>
+{{#each book}}
+<ul>
+    <li>{{this.id}} - {{this.title}}: {{this.pageqty}} páginas - <a href="/book/edit/{{this.id}}">Editar?</a></li>
+</ul>
+{{/each}}
