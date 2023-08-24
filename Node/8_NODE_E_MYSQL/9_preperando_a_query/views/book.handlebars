@@ -1,0 +1,11 @@
+<h1>Livros disponíveis:</h1>
+{{#each book}}
+<div style="display: flex; align-items: center;">
+    <ul>
+        <li>{{this.id}} - {{this.title}}: {{this.pageqty}} páginas - <a href="/book/edit/{{this.id}}">Editar?</a></li>
+    </ul>
+    <form action="/book/remove/{{this.id}}" method="POST">
+        <input style="margin-left: 10px;" type="submit" value="Delete">
+    </form>
+</div>
+{{/each}}

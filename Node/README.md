@@ -604,6 +604,71 @@ app.post("/books/updatebook",(req,res)=>{
 })
 ```
 
+## Remover itens
+Para remover um item vamos utilizar a query **DELETE**. Precisamos enviar para a rota um POST com o id do item a ser removido
+
+```js
+app.post('/book/remove/:id',(req,res)=>{
+    const id = req.params.id;
+    const query = `DELETE FROM books WHERE id = ${id}`
+    conn.query(query,(err)=>{
+        if(err){
+            console.log(err)
+            return
+        }
+        res.redirect('/book/')
+    })
+})
+```
+
+```html
+    <form action="/book/remove/{{this.id}}" method="POST">
+        <input style="margin-left: 10px;" type="submit" value="Delete">
+    </form>
+```
+
+## Connection Pool
+
+Connection Pool é um recurso para otimizar as conexões, criando um cache e permitindo sua reutilização. O driver mysql tem este recurso desenvolvido, podemos aplicá-lo. Este recurso também controla as conexões abertas, fechando assim que se tornam inativas;
+
+```js
+const conn  = mysql.createPool({
+    connectionLimit: 10,
+    host: "localhost",
+    user: "root",
+    password: "Ab123456",
+    database: "nodeapp"
+})
+```
+
+Aqui, você está criando uma pool de conexões com o banco de dados MySQL. Uma pool de conexões é um conjunto de conexões de banco de dados pré-criadas que podem ser reutilizadas, em vez de abrir e fechar uma nova conexão toda vez que for necessário interagir com o banco de dados. Vamos analisar os parâmetros:
+
+- **connectionLimit**: Define o número máximo de conexões simultâneas permitidas na pool. No exemplo, está definido como 10, o que significa que a pool pode conter até 10 conexões simultâneas.
+
+## Preparando a query
+
+Uma forma de nos defendermos de SQL Injection. Podemos utilizar interrogações em vez dos valores, e substituir através de um segundo passo, para a query ser executada corretamente. Esta técnica deve ser utilizada em qualquer programa que vá para a produção.
+
+```js
+app.post('/books/insertbook',(req,res)=>{
+    const {title, pageqty} = req.body
+    const query = `INSERT INTO books (??, ??) VALUES (?,?)`
+    const data = ['title', 'pageqty', title, pageqty]
+    conn.query(query,data, (err)=>{
+        if(err){
+            console.log(err)
+        }
+        res.redirect('/')
+    })
+})
+```
+
+- Uma consulta SQL preparada está sendo construída usando o template query. O uso de ?? na consulta indica placeholders para nomes de colunas que serão escapados automaticamente, ajudando a prevenir **injeções de SQL**. Os valores reais serão passados posteriormente como parte dos dados da consulta.
+- Um array **data** está sendo criado, contendo os valores que serão inseridos na consulta. As primeiras duas strings ("title" e "pageqty") são os nomes das colunas, enquanto **title** e **pageqty** são os valores extraídos do corpo da requisição.
+- Os placeholders **??** (chave) e **?** (valor) serão substituídos pelos valores fornecidos no array **data**.
+
+
+
 ## Apêndice: Comandos iniciais no MySql
 
 Comandos dentro do MySQL
@@ -621,6 +686,7 @@ Comandos dentro do MySQL
 - **UPDATE nome_da_tabela SET coluna1 = valor1, coluna2 = valor2, ... WHERE condição;** -> Atualizar dados em uma tabela
 - **DROP TABLE nome_da_tabela;** -> exclui uma tabela
 - **SHOW STATUS;** -> Exibe informações sobre o servidor
+- **TRUNCATE TABLE _table_:** Delete tudo em uma tabela, inclusive o ID
 
 Os arquivos do MySql ficam no diretório **/var/lib/mysql**
 
