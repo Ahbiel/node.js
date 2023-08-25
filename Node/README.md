@@ -690,3 +690,118 @@ Comandos dentro do MySQL
 
 Os arquivos do MySql ficam no diretório **/var/lib/mysql**
 
+# Seção 9 - Sequilize (ORM)
+
+**O que é uma ORM?**
+
+ORM é uma abreviação para **Object-Relational Mapping** ou Mapeamento Objeto-Relacional em português. É uma técnica de programação que permite que você acesse e manipule dados em um banco de dados relacional usando objetos e métodos orientados a objetos. Em vez de escrever consultas SQL manualmente (queries), você interage com os dados do banco de dados como se estivesse manipulando objetos em uma linguagem de programação (em resumo, Abstrai a complexidade das queries, para trabalharmos com métodos)
+
+Em alguns casos uma ORM pode trazer prejuízos de performance, pois query pura executa mais rapidamente do que a ORM. E temos código “gerado”, ou seja, não vemos por baixo dos panos.
+
+Com um ORM, as tabelas do banco de dados são mapeadas para classes de objetos e as colunas são mapeadas para atributos dessas classes. Isso facilita a interação com o banco de dados, abstraindo as complexidades do SQL subjacente e tornando o código mais legível e manutenível.
+
+Uma ORM muito utilizada para Node.js é a **Sequelize**
+
+**Mais sobre o Sequelize**
+
+Sequelize é uma biblioteca Node.js de mapeamento objeto-relacional (ORM) para bancos de dados SQL e é baseada em promises (then, catch). Ele oferece uma camada de abstração sobre bancos de dados relacionais, permitindo que você manipule dados de bancos de dados SQL usando objetos JavaScript.
+
+Caracteristicas:
+- **Mapeamento de Tabelas e Colunas:** O Sequelize permite que você defina modelos JavaScript que mapeiam tabelas e colunas no banco de dados. Isso facilita a criação, leitura, atualização e exclusão de registros do banco de dados usando objetos.
+- **Consultas e Relacionamentos:** O Sequelize fornece uma API para executar consultas complexas, como JOINs, filtros e ordenações. Além disso, ele permite definir relacionamentos entre modelos, como associações de um-para-um, um-para-muitos e muitos-para-muitos.
+- **Migrações:** O Sequelize também suporta migrações, que são scripts que podem ser usados para criar e atualizar automaticamente o esquema do banco de dados conforme seu modelo evolui.
+- **Compatibilidade com Diferentes Bancos de Dados:** O Sequelize suporta vários bancos de dados SQL, como MySQL, PostgreSQL, SQLite e Microsoft SQL Server.
+- **Validações:** A biblioteca também fornece validações para garantir que os dados inseridos ou atualizados no banco de dados estejam em conformidade com regras específicas.
+
+## Instalando o Sequelize
+
+Para instalar o Sequelize utilizamos o pacote **sequelize** e o pacote do **mysql2** para que o sequelize crie uma ponte até a o mysql. E para conectar precisamos passar os mesmos dados que no outro pacote: **banco, usuário e senha**, instanciando a classe Sequelize. É possível checar a conexão com o método authenticate;
+
+```js
+import {Sequelize} from 'sequelize'
+
+const sequelize = new Sequelize('orm', 'root', 'Ab123456', {
+    host: 'localhost',
+    dialect: 'mysql'
+});
+
+try {
+    sequelize.authenticate();
+    console.log('Sequelize conectado com sucesso');
+} catch (error) {
+    console.log('Não foi possível conectar', err);
+}
+
+export default sequelize;
+```
+- Primeiro, a biblioteca sequelize é importada. Ela permite criar uma instância do Sequelize para interagir com bancos de dados SQL usando ORM.
+- Segundo, uma instância do Sequelize é criada com as informações de conexão ao banco de dados. No exemplo, a instância é criada para se conectar a um banco de dados MySQL chamado 'orm', usando o usuário 'root' e a senha 'Ab123456'. O host indica que o banco de dados está localizado no localhost. O dialect define o tipo de banco de dados (neste caso, MySQL).
+- Terceiro, O bloco try tenta autenticar a conexão com o banco de dados usando o método authenticate() da instância do Sequelize. Se a autenticação for bem-sucedida, uma mensagem é exibida no console. Se ocorrer algum erro durante a autenticação, o bloco catch captura o erro e exibe uma mensagem de erro.
+
+## Criando um Model
+
+Como com o sequelize não usamos queries para acessar as tabelas, vamos utilizar os Models
+- Um "Model" é uma representação em código de uma tabela no banco de dados relacional. Ele permite que você interaja com os dados do banco de dados de maneira orientada a objetos, abstraindo as complexidades das consultas SQL. O id também pe criado automaticamente
+
+Para criar um Model temos que instanciar uma classe que representará uma tabela. Um **Model User** cria uma nova tabela chamada users. Colocamos os campos e os tipos dele como propriedades do Model. E futuramente ele será utilizado para as operações entre aplicação e banco. O método **sync** faz a criação das tabelas baseada nos models.
+
+```js
+import { Sequelize, DataTypes } from 'sequelize';
+
+const sequelize = new Sequelize('database', 'username', 'password', {
+    host: 'localhost',
+    dialect: 'mysql'
+});
+
+const User = sequelize.define('User', {
+    // Definindo os atributos do Model
+    firstName: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    lastName: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
+    }
+});
+
+// Sincroniza o Model com o banco de dados
+sequelize.sync();
+
+export default User;
+```
+
+- **DataTypes**: é uma enumeração fornecida pelo Sequelize que define os tipos de dados que podem ser usados ao definir os atributos de um Model. Ela permite que você especifique o tipo de dado que cada coluna da tabela do banco de dados irá armazenar.
+- User é o nome do Model.
+- Os atributos **firstName**, **lastName** e **email** correspondem às colunas na tabela Users no banco de dados.
+- **DataTypes.STRING:** indica que os campos são do tipo string.
+- **allowNull:** false indica que os campos não podem ser nulos.
+- **unique:** true garante que o valor do campo email seja único.
+- **required:** true indica diz que não pode ser um campo 'vazio', tem q ser preenchido.
+
+De todo modo, podemos exportar esse arquivo, e importar no nosso index.js, e estabelecer a comunicação com o servidor apenas se a tabela for criada com sucesso, dessa forma:
+
+```js
+import conn from './db/conn.js' //importa a instancia com as informações do DB
+
+conn.sync().then(()=>{
+    app.listen(port)
+}).catch((err)=>{
+    console.log(err)
+})
+```
+
+Se utilizarmos um gerenciador de banco de dados, podemos visualizar que duas coluns tam´bem foram criadas, o createdAt e o updatedAt. O **createdAt e updatedAt** são colunas especiais que muitos ORM (Object-Relational Mapping) utilizam para acompanhar quando um registro foi criado e quando foi atualizado pela última vez em uma tabela do banco de dados.
+- **createdAt (Criado Em):** Essa coluna registra a data e hora exata em que um registro foi inserido na tabela. Geralmente, ela é preenchida automaticamente quando um novo registro é adicionado à tabela.
+- **updatedAt (Atualizado Em):** Essa coluna registra a data e hora em que um registro foi atualizado pela última vez. Sempre que um registro é alterado, essa coluna é atualizada para refletir o momento da alteração.
+
+
+
+
+
+
