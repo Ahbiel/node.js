@@ -1,0 +1,11 @@
+<div>
+    <form action="/book/create" method="POST">
+        <input type="text" name="title" value="{{book.title}}" placeholder="Digite uma tarefa">
+        <input type="submit">
+    </form>
+    {{#each data}}
+        <ul style="display: flex;">
+            <li>{{this.title}} - <a style="margin-left:5px" href="/book/{{this.id}}">Edit</a></li> - <form action="/book/delete/{{this.id}}" method="POST"><input style="margin-left: 10px;" type="submit" value="delete"></form>
+        </ul>
+    {{/each}}
+</div>

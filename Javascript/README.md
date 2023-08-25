@@ -405,6 +405,40 @@ console.log(c1.readNovo)
 console.log(c2.readNovo)
 ```
 
+## Heranças
+
+- **classe pai**: a classe que está sendo herdada
+- **classe filho**: a classe que vai herdar
+
+Basicamente, funciona como se a classe pai possuísse características comuns, e as classes filhos características individuais.
+
+**Métodos de manipulação de Heranças:**
+
+- **extends:** utiliza essa palavra chave para que a classe filho herde a classe pai
+- **super():** é usado na classe filho para acessar a classe pai, ou seja, a classe filho acessa alguma informação da classe pai
+
+```js
+class quarto extends comodos{
+	constructor(cor){
+		super(1)
+		this.Cor = cor
+		this.tamanho = "grande"
+	}
+	info(){
+		super.info() 
+	}
+}
+let v1 = new quartos() // vai herdar todas as informações que estiverem dentro da classe pai
+```
+- O construtor constructor(cor) recebe um parâmetro cor e chama super(1) para invocar o construtor da classe pai comodos passando o valor 1. Isso indica que um quarto terá 1 cômodo.
+- As linhas seguintes atribuem valores às propriedades da instância da classe quarto: this.Cor = cor; define a cor do quarto como o valor passado no construtor (cor), e this.tamanho = "grande"; define o tamanho do quarto como "grande".
+- O método info() é definido, e ele chama super.info() para invocar o método info() da classe pai. No entanto, o método info() da classe quarto não faz mais nada além de chamar o método da classe pai.
+
+
+O construtor da classe filho vai acessar o construtor da classe pai, e o valor que estiver dentro dos parâmetros do "super" será armazenado dentro dos parâmetros do constructor da classe pai.
+Eu posso configurar e acessar funções dentro da classe pai utilizando a classe filho.
+se eu tiver na classe filho uma mesma função da classe pai, a função a ser chamada será da classe filho, a não ser que eu coloque um "super.nome_da_função()", assim as informações da classe pai será passada para a função da classe filho
+
 ## Promise:
 
 As Promises (Promessas) proporcionam uma maneira mais eficiente e estruturada de lidar com operações assíncronas, como chamadas de **API**, **leitura/gravação de arquivos** e outras tarefas que **não podem ser executadas imediatamente**. 
@@ -531,4 +565,21 @@ async function main() {
 }
 
 main();
+```
+
+## Função de callback
+
+```js
+let nome = []
+function lernome(){ //o nome não é escrito por que é adicionado depois que a função lerNome é chamado
+   nome.forEach((index)=>{
+       console.log(index);
+   })
+}
+function addnome(mynome, addonome){ //o parâmetro addonome tem o valor da função
+   nome.push(mynome)
+   console.log(addonome);//{function: lernome}
+   addonome() //chama a função lernome que está salvo dentro do parâmetro dessa função
+}
+addnome("Angelo",lernome) // adcionar a chamada da função como um parâmetro
 ```

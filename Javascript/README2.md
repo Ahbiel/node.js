@@ -310,6 +310,8 @@ console.log(c1.readNovo)
 console.log(c2.readNovo)
 ```
 
+
+
 ## Promise:
 
 As Promises (Promessas) proporcionam uma maneira mais eficiente e estruturada de lidar com operações assíncronas, como chamadas de **API**, **leitura/gravação de arquivos** e outras tarefas que **não podem ser executadas imediatamente**. 
