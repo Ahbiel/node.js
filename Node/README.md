@@ -800,8 +800,50 @@ Se utilizarmos um gerenciador de banco de dados, podemos visualizar que duas col
 - **createdAt (Criado Em):** Essa coluna registra a data e hora exata em que um registro foi inserido na tabela. Geralmente, ela é preenchida automaticamente quando um novo registro é adicionado à tabela.
 - **updatedAt (Atualizado Em):** Essa coluna registra a data e hora em que um registro foi atualizado pela última vez. Sempre que um registro é alterado, essa coluna é atualizada para refletir o momento da alteração.
 
+## Inserindo dados com o sequelize
 
+Para inserir um dado vamos precisar do **Model que criamos**, utilizando o método **create**. Ele leva como parâmetro todos os campos, e insere o registro na tabela. Podemos utilizar o **Async await** para evitar possivéis erros
+```js
+app.post('/users/create', async(req,res)=>{
+    let {name, occupation, newsletter} = req.body
+    console.log(name,occupation,newsletter)
+    if(newsletter === 'on'){ // caso o newsletter for verdadeiro, o retorno será de 'on' 
+        newsletter = true
+    } else{
+        newsletter = false
+    }
+    await User.create({name,occupation,newsletter})
+    res.redirect('/')
+})
+```
 
+## Lendo dados com o sequelize
 
+Para ler os dados de uma tabela vamos utilizar o método **fetchAll**, que também requer o model (no nosso caso o User). Os dados vem em um objeto especial, para transformar em um array de objetos temos que inserir um parâmetro, que é o **raw** como **true**.
 
+```js
+app.get('/', async(req,res)=>{
+    const users = await User.findAll({raw:true})
+    console.log(users)
+    res.render('home', {users})
+})
+```
 
+## Utilizando o WHERE
+
+Para filtrar dados com o Sequelize utilizando o WHERE, precisamos inserir um novo parâmetro, que será o where, um objeto onde colocamos a propriedades e valores que queremos filtrar. E para retornar apenas um resultado podemos utilizar o método findOne. 
+
+Podemos passar apenas um valor para ser filtrado, como podemos passar mais de um valor. No exemplo abaixo, foi utilizado os métodos **then e catch** ao invés do **async/await**
+
+```js
+app.get('/users/:id', async(req,res)=>{
+    const id = req.params.id;
+    User.findOne({raw:true, where: {id:id}}).
+        then(
+            (user)=>{
+                res.render('userview',{user})
+            }
+        ).
+        catch((err)=>console.log(err))
+})
+```
