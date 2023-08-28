@@ -1,0 +1,9 @@
+<ul>
+    <li>Nome: {{user.name}}</li>
+    <li>Profissão: {{user.occupation}}</li>
+    {{#each user.Addresses}}
+        <li>Rua: {{this.street}}</li>
+        <li>Número: {{this.number}}</li>
+        <li>Cidade: {{this.city}}</li>
+    {{/each}}
+</ul>

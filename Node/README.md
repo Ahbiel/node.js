@@ -847,3 +847,250 @@ app.get('/users/:id', async(req,res)=>{
         catch((err)=>console.log(err))
 })
 ```
+
+## Removendo itens
+Para remover itens utilizando o método **destroy** juntamente com o **where**.
+
+```js
+app.post('/users/delete/:id',(req,res)=>{
+    const id = req.params.id;
+    User.destroy({
+        where: {id:id}
+    }).then((user)=>{
+        res.redirect('/')
+    }).catch((err)=>console.log(err))
+})
+```
+
+## Atualizando o dado no banco
+Para realizar a query de UPDATE vamos utilizar o método **update** do Sequelize. Nele passamos o objeto atualizado do item, e também filtramos por meio do atributo **where**, que item vamos atualizar;
+
+```js
+app.post('/users/update',(req,res)=>{
+    let {id,name,occupation,newsletter} = req.body;
+    newsletter === 'on'? newsletter = true : newsletter = false
+    const userData = {
+        id,name,occupation,newsletter
+    }
+    User.update(userData,{
+        where:{id}
+    }).then((user)=>{
+        res.redirect('/')
+    }).catch((err)=>console.log(err))
+})
+```
+
+## Refazer as tabelas
+Podemos forçar a reconstrução das tabelas através do método sync, onde são sincronizados os models e as tabelas. Vamos colocar um atributo: **force como true**;
+```js
+conn.sync({force:true}).then(()=>{
+    app.listen(port)
+}).catch((err)=>{
+    console.log(err)
+})
+``` 
+Note que os dados são perdidos neste processo;
+
+## Relacionamentos (Constraints)
+Em bancos relacionais podemos criar relacionamentos entre as tabelas (onde uma tabela pode chamar a outra, como no caso de um determinado pedido associado a um usuário em questão). Para concretizar isso no Sequelize vamos precisar de dois Models, ou seja, precisamos criar mais um no nosso projeto. Depois precisamos inserir um método de relacionamento em algum dos models que vai criar a relação. Após o sync uma coluna que faz a relação entre as tabelas será criada
+
+Isso representa a **FOREIGN KEY**
+
+## Criando um model com relacionamento
+
+Para criar um relacionamento entre models, vamos primeiro criar outro model que queremos fazer a associação, e por fim, vamos criar o relacionamento entre eles. Existem quatro tipos principais de relacionamentos suportados pelo Sequelize: "**hasOne**", "**belongsTo**", "**hasMany**" e "**belongsToMany**".
+
+- **hasOne**: Um relacionamento "hasOne" é usado quando uma instância de um modelo está associada a uma única instância de outro modelo. Por exemplo, imagine um cenário onde um usuário tem uma única configuração. O modelo de usuário teria um relacionamento "hasOne" com o modelo de configuração.
+- **belongsTo**: Um relacionamento "belongsTo" é a contrapartida do "hasOne". Ele é usado quando uma instância de um modelo está associada a uma única instância de outro modelo, mas é o modelo associado que mantém a chave estrangeira. Por exemplo, em um relacionamento entre um pedido e um cliente, o pedido "pertence a" um cliente.
+- **hasMany**: Um relacionamento "hasMany" é usado quando uma instância de um modelo está associada a várias instâncias de outro modelo. Por exemplo, um autor pode ter vários livros. Nesse caso, o modelo de autor teria um relacionamento "hasMany" com o modelo de livro.
+- **belongsToMany**: Um relacionamento "belongsToMany" é usado para modelar associações muitos-para-muitos entre dois modelos. Por exemplo, imagine um relacionamento entre alunos e disciplinas. Um aluno pode se inscrever em várias disciplinas e uma disciplina pode ter vários alunos. Esse relacionamento exigiria uma tabela intermediária no banco de dados para rastrear essas associações.
+
+```js
+import {DataTypes} from 'sequelize'
+import db from '../db/conn.js'
+import User from './User.js'
+
+const Address = db.define('Address',{
+    street: {
+        type: DataTypes.STRING,
+        required:true
+    },
+    number:{
+        type: DataTypes.STRING,
+        required: true
+    },
+    city:{
+        type: DataTypes.STRING,
+        required:true 
+    }
+});
+Address.belongsTo(User) //O Model Address pertence ao model User
+export default Address
+// vamos Refazer as tabelas com o metodo force antes de começar a utilizar os relacionamentos
+```
+
+## Adicionando dado relacionado
+Para adicionar o dado relacionado o fluxo é quase o mesmo. O grande detalhe é que precisamos passar o **id do item** que o relaciona.
+
+HTML:
+```html
+<form action="/address/create" method="POST">
+    <input type="hidden" name="UserId" value="{{user.id}}"> 
+    <div>
+      <label for="street">Rua:</label>
+      <input type="text" name="street" placeholder="Digite o nome da rua">
+    </div>
+        <div>
+      <label for="number">Número:</label>
+      <input type="text" name="number" placeholder="Digite o número da residência">
+    </div>
+        <div>
+      <label for="city">Cidade:</label>
+      <input type="text" name="city" placeholder="Digite o nome da cidade">
+    </div>
+    <input type="submit" value="Incluir endereço">
+</form>
+```
+Os campos "name" precisa ser igual a colua criada dentro do banco de dados "address"
+
+Javascript:
+```js
+app.post('/address/create/',(req,res)=>{
+    const {UserId, street, number,city} = req.body
+    const UserData = {
+        UserId,street,number,city
+    }
+    Address.create(UserData).then((user)=>{
+        res.redirect(`/users/edit/${UserId}`)
+    }).catch((err)=>console.log(err))
+})
+```
+- **UserId**: Essa coluna representa uma **chave estrangeira** que se refere ao ID do usuário associado a este endereço. Isso indica qual usuário tem esse endereço. O relacionamento entre essa tabela de endereços e uma tabela de usuários é estabelecido através dessa chave estrangeira.
+
+## Resgatando dados relacionados
+Precisamos definir as relações entre os dois Models, podemos fazer isso no Model de endereços. Depois basta utilizar o operador **include** com o nome do Model, onde estamos resgatando o dado, isso faz com que os registros associados também venham na seleção. Como há dados relacionados, precisamos remover o **raw**
+
+```js
+app.get('/users/edit/:id',(req,res)=>{
+    const id = req.params.id;
+    User.findOne(
+        {include:Address, where: {id:id}} //remover o "raw" e substituir pelo "include"
+    ).then((user)=>{
+        res.render('useredit', { user: user.get({plain:true}) })
+    }).catch((err)=>console.log(err))
+})
+```
+- **User.findOne(...):** Esta é uma operação de consulta à base de dados usando o modelo User. A função findOne é usada para encontrar um único registro na tabela de usuários com base em determinados critérios.
+- **{ include: Address, where: { id: id } }:** Isso define as opções da consulta. Está solicitando ao banco de dados para encontrar um usuário com um determinado id e incluir os dados da relação com o modelo Address. Isso provavelmente significa que um usuário tem um endereço associado e você está buscando esses detalhes.
+- **.then((user) => {...}):** Após a consulta ser concluída com sucesso, a função passada para then é executada. O objeto user é o resultado da consulta.
+- **res.render('useredit', { user: user.get({ plain: true }) });:** Aqui, você está renderizando um modelo de visualização chamado 'useredit', passando os dados do usuário encontrado. O método get({ plain: true }) é usado para converter o objeto do usuário em um objeto JavaScript simples, sem os métodos e propriedades do Sequelize.
+
+
+```html
+<div class="address-list">
+    <h2>Lista de endereços:</h2>
+    {{#each user.Addresses}}
+      <p>#{{this.id}} - {{this.street}} - {{this.number}} - {{this.city}}</p>
+    {{/each}}
+  </div>
+```
+
+Diferença entre **include** e **raw**
+
+- **include**: O include é usado para realizar junções de tabelas (joins) no momento da consulta. Isso permite que você traga informações de tabelas relacionadas junto com a consulta principal. No seu caso, você está usando o include para trazer os detalhes do endereço relacionado ao usuário na consulta.
+- **raw:** O raw é utilizado para obter os resultados da consulta em formato bruto, ou seja, não são instâncias de modelos Sequelize. Isso pode ser útil quando você deseja apenas os dados brutos sem a manipulação ou transformação feita pelo Sequelize.
+
+## Removendo relacionados
+Para remover itens relacionados utilizaremos o mesmo processo de remoção de itens. Criaremos um formulário que envia o id do item. E uma rota para receber estas informações e executar a remoção,
+utilizando o método **destroy**;
+
+```js
+app.post('/address/delete',(req,res)=>{
+    const id = req.body.id;
+    Address.destroy({
+        where:{id:id}
+    }).then((user)=>{
+        res.redirect('/')
+    }).catch((err)=>console.log(err))
+})
+```
+
+
+
+## Resumindo o Sequelize:
+
+Sequelize é uma biblioteca Node.js de mapeamento objeto-relacional (ORM - permite o acesso e a manipulação de dados em um banco de dados relacional usando objetos e métodos orientados a objetos) para bancos de dados SQL e é baseada em promises (then, catch).
+
+Para a utilização do Sequelize, precisamos baixar o **mysql2** e criar uma conexão com o banco de Dados da seguinte forma:
+
+```js
+const sequelize = new Sequelize(DB_name, user, passwd, {
+    host: 'localhost',
+    dialect: DB_type //mysql
+});
+```
+
+Ao invés de utilizarmos Queries, vamos utilizar o Models para acessar e gerenciar as tabelas dentro do nosso banco de dados:
+
+```js
+import { Sequelize, DataTypes } from 'sequelize';
+
+const sequelize = new Sequelize('database', 'username', 'password', {
+    host: 'localhost',
+    dialect: 'mysql'
+});
+
+const User = sequelize.define('User', {
+    // Definindo os atributos do Model
+    firstName: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    lastName: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
+    }
+});
+
+// Sincroniza o Model com o banco de dados
+sequelize.sync();
+
+export default User;
+```
+
+- O método **sync** faz a criação das tabelas baseada nos models.
+- **DataTypes**: é uma enumeração fornecida pelo Sequelize que define os tipos de dados que podem ser usados ao definir os atributos de um Model. Ela permite que você especifique o tipo de dado que cada coluna da tabela do banco de dados irá armazenar.
+- O **User** é um Model
+
+Nesse exemplo, teremos uma tabela com 5 colunas:
+- id
+- firstName
+- lastName
+- email
+- createdAt
+- updatedAt
+
+Temos também a opção de importar e exportar o sequelize como um promisse e liberar o **lister** da porta apenas se a conexão for estabelecida
+
+```js
+import conn from './db/conn.js' //importa a instancia com as informações do DB
+
+conn.sync().then(()=>{
+    app.listen(port)
+}).catch((err)=>{
+    console.log(err)
+})
+```
+
+**Métodos do sequelize**
+
+- **User.create({dados})**: insere dados dentro do DB (precisa corresponder as colunas)
+- **User.findAll({raw:true})**: lê os dados de um DB (o "**raw=true** serve para transformar em um array de objetos simples os dados lidos)
+- **User.findOne({raw:true, where: {id:id}})**: Serve para filtrar os dados com base no que foi passado dentro dos parâmetros (posso passar mais de uma informação para ser filtrado, ao invés de só o "id")
+- **User.destroy({where: {id:id}})**: remove um item dentro do banco de dados (importante passar o **where** para que não seja deletado todas as colunas)
+- **User.update(userData,{where:{id}})**: serve para atualizar os dados dentro de um db 
