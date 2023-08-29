@@ -1094,3 +1094,31 @@ conn.sync().then(()=>{
 - **User.findOne({raw:true, where: {id:id}})**: Serve para filtrar os dados com base no que foi passado dentro dos parâmetros (posso passar mais de uma informação para ser filtrado, ao invés de só o "id")
 - **User.destroy({where: {id:id}})**: remove um item dentro do banco de dados (importante passar o **where** para que não seja deletado todas as colunas)
 - **User.update(userData,{where:{id}})**: serve para atualizar os dados dentro de um db 
+
+
+## Seção 10 - MVC
+
+**O que é MVC?**
+
+MVC significa "Model-View-Controller" (Modelo-Visão-Controlador), que é um padrão de arquitetura de software amplamente utilizado no desenvolvimento de aplicativos (as deixando mais organizadas), especialmente em aplicações web. A principal vantagem do padrão MVC é a separação clara de preocupações (A aplicação é dividida em camadas, cada uma com sua responsabilidade). Isso facilita a manutenção, a escalabilidade e a reutilização do código, pois cada componente é independente dos outros. Além disso, diferentes equipes podem trabalhar em paralelo em diferentes partes da aplicação sem interferir umas com as outras. O padrão MVC separa a aplicação em três componentes distintos, cada um com sua própria responsabilidade:
+- **Modelo (Model):** 
+  - É uma camada onde vamos interagir com o banco de dados e normalmente interage com os arquivos do Controller.
+  - Responsável por resgatar, atualizar, remover e criar dados (crud)
+  - É comum que cada tabela seja um Model, assim como fazemos com o setup do Sequelize.
+  - Os Models são quem controlam a arquitetura do sistema
+- **Visão (View):** 
+  - A visão é responsável pela apresentação dos dados que estão no banco ao usuário. 
+  - Ela lida com a interface gráfica e a representação visual dos dados. A visão não contém lógica de negócios, apenas exibe as informações ao usuário de acordo com as instruções do **controlador**.
+  - E também nas views temos a interação com o usuário, como formulários para inserir dados no sistema (É correto não haver lógica/regra de negócios na view, ou o mínimo possível).
+- **Controlador (Controller):** 
+  - O controlador atua como intermediário entre o Model e a View. 
+  - Ele recebe as entradas do usuário, processa as ações correspondentes e atualiza o modelo ou a visão conforme necessário. 
+  - O controlador também contém a lógica que coordena o fluxo de dados e a interação entre o modelo e a visão.
+  - Os Controllers terão um código parecido com os das rotas
+
+## Estrutura de pastas com o MVC
+- **controllers**: pasta que ficam os arquivos de Controller;
+- **models**: pasta que ficam os arquivos de Model;
+- **views**: pasta que ficam os arquivos de View;
+- **routes**: pasta que ficam os arquivos de rotas;
+- **index.js**: arquivo que inicializa a aplicação;
