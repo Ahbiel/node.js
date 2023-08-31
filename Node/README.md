@@ -1122,3 +1122,18 @@ MVC significa "Model-View-Controller" (Modelo-Visão-Controlador), que é um pad
 - **views**: pasta que ficam os arquivos de View;
 - **routes**: pasta que ficam os arquivos de rotas;
 - **index.js**: arquivo que inicializa a aplicação;
+
+## Criando um MVC
+
+- Primeiro vamos criar um Model chamado **Task**, passando essas informações:
+- Depois, vamos criar um Controller, chamado **TaskController**, importando o Model criado
+  - Dentro do arquivo TaskController, vamos criar uma classe chamada TaskController,
+  - Depois vamos criar um método estático chamado createTask 
+- Depois vamos em views, e vamos criar um diretório para nossas views
+- Agora vamos criar as rotas
+  - Vamos criar um arquivo chamado taskRoutes.js
+  - Vamos importar:
+    - Router do express
+    - TaskController.js
+  - Vou criar as rotas e logo em seguida exportar
+  - No index.js, vamos dar um express.use() e usar as rotas criadas
