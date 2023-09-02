@@ -667,8 +667,6 @@ app.post('/books/insertbook',(req,res)=>{
 - Um array **data** está sendo criado, contendo os valores que serão inseridos na consulta. As primeiras duas strings ("title" e "pageqty") são os nomes das colunas, enquanto **title** e **pageqty** são os valores extraídos do corpo da requisição.
 - Os placeholders **??** (chave) e **?** (valor) serão substituídos pelos valores fornecidos no array **data**.
 
-
-
 ## Apêndice: Comandos iniciais no MySql
 
 Comandos dentro do MySQL
