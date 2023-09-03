@@ -8,6 +8,8 @@ import flash from 'express-flash'
 import path from 'path'
 import os from 'os'
 import User from './models/User.js'
+import toughtsRoutes from './routes/toughtsRoutes.js'
+import ToughtsController from './controllers/ToughtsController.js'
 
 const app = express()
 
@@ -62,13 +64,20 @@ app.use((req,res,next)=>{
     if(req.session.userid){
         res.locals.session = req.session //manda os dados do usuário para a "resposta", permitindo o acesso no frontend
     }
+    next()
 })
+
+
 /*Nesta etapa, um middleware personalizado é usado para verificar se a sessão de um usuário
 possui um campo "userid". Se sim, os dados da sessão são armazenados nas variáveis locais 
 da resposta (res.locals.session). Isso permite que os dados da sessão sejam acessíveis 
 no frontend da aplicação. */
 
+//step seven - usar as rotas
+app.use('/toughts', toughtsRoutes)
+app.get('/', ToughtsController.showToughts)
+
 conn.sync().then(()=>{
     app.listen(3000)
-}).catch((err)=>console.log(err))
+}).catch((err)=>console.log('Erro',err))
 

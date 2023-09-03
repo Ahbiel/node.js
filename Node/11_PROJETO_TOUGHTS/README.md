@@ -177,4 +177,37 @@ User.hasMany(Tought) //"Um usuário pode ter mais de um pensamentos"
 
 export default Tought;
 ```
-Após criado, podemos importar as tabelas dentro do arquivo **index.js**
+Após criado, podemos importar os models dentro do arquivo **index.js**
+
+## Step five: Criando a home do projeto
+
+Primeiro, vamos configurar o layout inicial da aplicação, criando a nav bar, o main e o footer. Logo após, vamos começar a configurar o **controller** da nossa aplicação, e as **rotas** que iremos querer utilizar inicialmente para a **Home**
+```js
+//      ./controllers/ToughstController
+import Tought from '../models/Tought.js'
+import User from '../models/User.js'
+
+export default class ToughtsController {
+    static async showToughts(req,res) {
+        res.render('toughts/home') //aqui precisamos criar o arquivo home.handlebars dentro do diretório toughts
+    }
+}
+```
+
+```js
+//      ./routes/toughtsRoutes
+import express from 'express'
+import ToughtController from '../controllers/ToughtsController.js'
+const router = express.Router()
+
+router.get('/', ToughtController.showToughts)
+
+export default router
+```
+
+E, por fim, vamos importar o toughtsRoutes e o ToughstController no index.js e atribuir a seguinte linha de código:
+```js
+//step seven - usar as rotas
+app.use('/toughts', toughtsRoutes)
+app.get('/', ToughtsController.showToughts)
+```
