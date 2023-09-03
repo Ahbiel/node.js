@@ -211,3 +211,56 @@ E, por fim, vamos importar o toughtsRoutes e o ToughstController no index.js e a
 app.use('/toughts', toughtsRoutes)
 app.get('/', ToughtsController.showToughts)
 ```
+
+## Step six: Inicinado a autenticação
+
+Primeiro, vamos criar mais dois arquivos, uma rota chamado **authRoutes.js** e um controller chamado **AuthController.js**
+
+Esses dois arquivos serão para direcionar o usuário para a tela de "register" ou a tela de "login". Para ambas pricisamos criar uma view para a interação com o usuário.
+
+```js
+//authRoutes.js
+import {Router} from 'express'
+import AuthController from '../controllers/AuthController.js'
+const router = Router()
+
+router.get('/login', AuthController.login)
+router.get('/login', AuthController.register)
+
+export default router
+```
+```js
+//AuthController.js
+export default class AuthController {
+    static login(req,res){
+        res.render('auth/login')
+    }
+    static register(req,res){
+        res.render('auth/register')
+    }
+}
+```
+Vamos criar uma pasta chamada "auth" dentro de "views", e criar os arquivos "register" e "login", ambos com um formulário cujo método será o de POST. E depois, vamos importar o authRoutes para dentro do arquivo index.js e atribuir a seguinte linha de comando:
+```js
+app.use('/', authRoutes) //Não teremos conflito com outras rotas por não ter nada atrelado ao '/'
+```
+
+## Step seven: flash message inicio do registro
+
+Vamos criar uma flash message caso as senhas não combinem, e para isso, precisamos seguir o seguinte passo a passo:
+- Em authRoutes, criar um post com o '/register' chamando a função **registerPost**
+- Em AuthController, vamos armazenar todos os valores passado no formulário de registro em variávies (constantes)
+- Vamos fazer uma validação (password != confirmpassword)
+- Vamos criar as "messages", com o código req.flash('message', 'mensagem')
+  - Este código está usando o método flash para adicionar uma mensagem flash à sessão do usuário  associada à requisição req.
+  - '**message**': Este é o nome da chave sob a qual a mensagem será armazenada na sessão. No código HTML ou em um mecanismo de visualização, você pode recuperar a mensagem usando esta chave.
+  - **mensagem**: Este é o conteúdo da mensagem flash que você está armazenando.
+- agora em **main.handlebars**, vamos adcionar a seguinte instrução:
+```handlebars
+{{#if messages.message}}
+    <div class="message">
+        {{messages.message}}
+    </div>
+{{/if}}
+```
+  - **messages.message** é a chamada do "req.flash" com base na chave que atribuimos

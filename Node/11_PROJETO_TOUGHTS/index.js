@@ -7,9 +7,10 @@ import conn from './db/conn.js'
 import flash from 'express-flash'
 import path from 'path'
 import os from 'os'
-import User from './models/User.js'
+// import User from './models/User.js'
 import toughtsRoutes from './routes/toughtsRoutes.js'
 import ToughtsController from './controllers/ToughtsController.js'
+import authRoutes from './routes/authRoutes.js'
 
 const app = express()
 
@@ -37,7 +38,7 @@ app.use(
         name: 'session', // Nome da sessão
         secret: "nosso_secret", // Segredo usado para assinar a sessão
         resave: false, // Evita que as sessões sejam regravadas no armazenamento a menos que sejam modificadas
-        saveUninitialized: false, // Evita que sessões não inicializadas sejam salvas no armazenamento
+        saveUninitialized: true, // Evita que sessões não inicializadas sejam salvas no armazenamento
         store: new FileStoreSession({
             logFn: () =>{}, // Função de log (vazia no exemplo, mas necessita ser criado)
             path: Path // Diretório onde os arquivos de sessão serão armazenados
@@ -75,6 +76,7 @@ no frontend da aplicação. */
 
 //step seven - usar as rotas
 app.use('/toughts', toughtsRoutes)
+app.use('/', authRoutes)
 app.get('/', ToughtsController.showToughts)
 
 conn.sync().then(()=>{
