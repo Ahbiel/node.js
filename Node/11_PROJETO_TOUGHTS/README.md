@@ -262,5 +262,86 @@ Vamos criar uma flash message caso as senhas não combinem, e para isso, precisa
         {{messages.message}}
     </div>
 {{/if}}
+- Podemos tambem fazer a validação por email, tentando buscar no Banco de dados se aquele email existe
 ```
   - **messages.message** é a chamada do "req.flash" com base na chave que atribuimos
+
+## Step eight: Registrando usuários no sistema
+
+Para efetuamos o registro, vamos seguir o seguinte passo-à-passo ainda no arquivo **AuthController.sj**:
+- Primeiro, vamos criar um hash de senhas de forma segura antes de armazenar no banco de dados
+ - para isso, vamos usar o código **bcrypt.genSaltSync(10)** que é uma sequência aleatória de caracteres que é adicionada à senha antes de ser realizada a hash
+ - Depois vamos usar o código **bcrypt.hashSync(password, salt)** para criar uma hash segura da senha original 
+- Agora, vamos criar um objeto passando o Nome, o email, e a senha segura (password:hash) dentro do método **User.create()**
+- após isso, vamos criar uma sessão para o usuário, utilizando a seguinte linha de comando:
+```js
+const createUser = await User.create(user)
+req.flash('message','Cadastro realizado com sucesso')
+req.session.userid = createUser.id
+req.session.save(()=>{
+    res.redirect('/')
+})
+```
+  - **req.session.userid = createUser.id:** Aqui, está armazenando o ID do usuário recém-criado na sessão do usuário. A sessão é geralmente usada para manter informações do usuário entre várias solicitações HTTP, de modo que o servidor possa identificar o usuário entre as solicitações. O ID do usuário pode ser útil para autenticação e autorização em solicitações futuras.
+  - **req.session.save(() => { res.redirect('/') }):** Nesta parte, a sessão é salva, o que geralmente é necessário para garantir que todas as alterações na sessão sejam persistidas. Após a sessão ser salva, o código redireciona o usuário para a rota '/'. Isso geralmente é feito após um login ou registro bem-sucedido para levar o usuário à página inicial ou a uma página de destino após a ação.
+Após isso, podemos adcionar uma validação dentro do **main.handlebars** com a seguinte linha de código:
+```handlebars
+ <ul>
+    <li><a href="/">Pensamentos</a></li>
+    {{! URL após a autenticação }}
+    {{#if session.userid}}
+        <li><a href="/tougths/dashboard">Dashboard</a></li>
+        <li><a href="/logout">Sair</a></li>
+    {{else}}
+        <li><a href="/login">Entrar</a></li>
+        <li><a href="/register">Registrar</a></li>
+    {{/if}}
+</ul>
+```
+
+Para finalizar, podemos criar uma forma do usuário fazer o logout do sistema, para isso vamos:
+- criar uma rota dentro do **authRoutes** para o /logout, criando a função logout dentro do **AuthController**.
+- Dentro da função, vamos utilizar o método **req.session.destroy();** para remover a sessão do usuário.
+
+**importante**
+
+Para o registro funcionar corretamente, precisamos da seguinte linha de código dentro do arquivo **index.js**
+```js
+app.use((req,res,next)=>{
+    if(req.session.userid){
+        res.locals.session = req.session
+    }
+    next()
+})
+```
+
+## Step nine: Criando um sistema de login
+
+Para criar o sistema de login, vamos trabalhar nos arquivos **authRoutes.js** e **AuthController.js**
+- Dentro do arquivo **authRoutes.js**, vamos criar uma rota do tipo POST para o /login chamando a função **loginPost**
+- agora dentro do arquivo **AuthController.js**, vamos utilizar o seguinte bloco de código:
+```js
+static async loginPost(req,res){
+    const {email,password} = req.body
+    //find user
+    const user = await User.findOne({where:{email:email}})
+    const passwordMatch = bcrypt.compare(password, user.password)
+    if(!user){
+        req.flash('message','Usuário não encontrado')
+        res.render('auth/login')
+        return
+    }else if(!password){
+        req.flash('message','A senha não combina com o sistema')
+        res.render('auth/login')
+        return
+    }
+    req.session.userid  = user.id
+    req.flash('message','Login efetuado com sucesso')
+    res.render('auth/login')
+    req.session.save(()=>{
+        res.redirect('/')
+    })
+}
+```
+  - **const passwordMatch = bcrypt.compare(password, user.password):** Aqui, a biblioteca bcrypt é usada para comparar a senha fornecida na requisição com a senha armazenada no registro do usuário encontrado anteriormente. A função compare verifica se as senhas coincidem e retorna um valor booleano (true se coincidirem, false caso contrário).
+  - **req.session.userid = user.id:** Se o usuário for encontrado e a senha estiver correta, o ID do usuário é armazenado na sessão do usuário. Isso provavelmente é usado para rastrear a autenticação do usuário em sessões subsequentes.

@@ -60,7 +60,7 @@ usuários após redirecionamentos. */
 //step five - public path
 app.use(express.static('public'))
 
-//step six - salvar a sessão da resposta para poder utilizar a flash message
+//step six - salvar o usuário dentro da session
 app.use((req,res,next)=>{
     if(req.session.userid){
         res.locals.session = req.session //manda os dados do usuário para a "resposta", permitindo o acesso no frontend
