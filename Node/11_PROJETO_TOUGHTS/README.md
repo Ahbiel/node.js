@@ -345,3 +345,24 @@ static async loginPost(req,res){
 ```
   - **const passwordMatch = bcrypt.compare(password, user.password):** Aqui, a biblioteca bcrypt é usada para comparar a senha fornecida na requisição com a senha armazenada no registro do usuário encontrado anteriormente. A função compare verifica se as senhas coincidem e retorna um valor booleano (true se coincidirem, false caso contrário).
   - **req.session.userid = user.id:** Se o usuário for encontrado e a senha estiver correta, o ID do usuário é armazenado na sessão do usuário. Isso provavelmente é usado para rastrear a autenticação do usuário em sessões subsequentes.
+
+## Step ten: Middleware de verificação de autenticação
+
+Se eu fizer login na minha aplicaçao, e ir na seção 'dashboard' e der um reload no site, eu continuarei nessa seção, porem não estarei mais logado no sistema.
+- Primeiro vamos configurar a seção dashboard
+  - No arquivo **toughtsRoutes**, vamos criar uma rota do tipo get para /dashboard chamando a função dashboard
+  - No arquivo **ToughtsController**, vamos criar a função dashboard apenas renderizando o 'toughts/dashboard'
+  - Vamos criar um arquivo chamado **dashboard.handlebars** dentro do diretório views/toughts/
+- Agora vamos criar outro diretório chamado "helper" e então criar um arquivo **auth.js** com o seguinte código:
+```js
+export const checkAuth = (req,res,next) => {
+    const userid = req.session.userid
+    if(!userid){
+        res.redirect('/login')
+    }
+    next()
+}
+```
+- **const userid = req.session.userid:** Aqui, a função está tentando obter o userid a partir do objeto req.session. Isso sugere que a aplicação usa algum tipo de sistema de sessão para rastrear usuários autenticados. O userid é armazenado na sessão do usuário, que é uma maneira comum de manter o estado de autenticação do usuário entre as solicitações. 
+- **if (!userid):** Esta linha verifica se não há um userid. Isso implica que a verificação de autenticação falhou, pois um usuário autenticado geralmente teria um userid associado à sua sessão.
+- **res.redirect('/login'):** Se o userid não estiver presente (ou seja, o usuário não está autenticado), a função redirecionará o usuário para a rota /login. Isso é comum em sistemas de autenticação web, onde os usuários não autenticados são redirecionados para uma página de login para entrar antes de acessar certas partes do aplicativo.
