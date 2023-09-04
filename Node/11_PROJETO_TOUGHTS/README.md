@@ -363,6 +363,17 @@ export const checkAuth = (req,res,next) => {
     next()
 }
 ```
-- **const userid = req.session.userid:** Aqui, a função está tentando obter o userid a partir do objeto req.session. Isso sugere que a aplicação usa algum tipo de sistema de sessão para rastrear usuários autenticados. O userid é armazenado na sessão do usuário, que é uma maneira comum de manter o estado de autenticação do usuário entre as solicitações. 
-- **if (!userid):** Esta linha verifica se não há um userid. Isso implica que a verificação de autenticação falhou, pois um usuário autenticado geralmente teria um userid associado à sua sessão.
-- **res.redirect('/login'):** Se o userid não estiver presente (ou seja, o usuário não está autenticado), a função redirecionará o usuário para a rota /login. Isso é comum em sistemas de autenticação web, onde os usuários não autenticados são redirecionados para uma página de login para entrar antes de acessar certas partes do aplicativo.
+  -**const userid = req.session.userid:** Aqui, a função está tentando obter o userid a partir do objeto req.session. Isso sugere que a aplicação usa algum tipo de sistema de sessão para rastrear usuários autenticados. O userid é armazenado na sessão do usuário, que é uma maneira comum de manter o estado de autenticação do usuário entre as solicitações. 
+  - **if (!userid):** Esta linha verifica se não há um userid. Isso implica que a verificação de autenticação falhou, pois um usuário autenticado geralmente teria um userid associado à sua sessão.
+  - **res.redirect('/login'):** Se o userid não estiver presente (ou seja, o usuário não está autenticado), a função redirecionará o usuário para a rota /login. Isso é comum em sistemas de autenticação web, onde os usuários não autenticados são redirecionados para uma página de login para entrar antes de acessar certas partes do aplicativo.
+- Depois disso, vamos chamar essa função dentro do arquivo **toughtsRoutes.js**
+
+## Step eleven: Criação de pensamentos
+
+Primeiro, vamos criar a rota dentro do **toughtsRoutes.js** para o caminho '/add' chamando a função createTought. Depois, vamos criar uma função chamada **createTought** renderizando o arquivo /views/toughts/create
+
+Agora, para inserir os pensamentos no banco de dados, vamos:
+- Criar uma rota do tipo post para o '/toughts/add' chamando a função createToughtSave dentro do arquivo **toughtsRoutes.js**
+- Vamos criar a função createToughtSave dentro do arquivo **ToughtsController.js**
+ - Dentro dessa função, vamos passar os pensamentos com o **UserId** igual ao id do usuário que está logado (req.session.userid)
+ - Vamos armazenar o pensamento com o comando **tought.create()**
