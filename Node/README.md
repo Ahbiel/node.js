@@ -817,7 +817,7 @@ app.post('/users/create', async(req,res)=>{
 
 ## Lendo dados com o sequelize
 
-Para ler os dados de uma tabela vamos utilizar o método **fetchAll**, que também requer o model (no nosso caso o User). Os dados vem em um objeto especial, para transformar em um array de objetos temos que inserir um parâmetro, que é o **raw** como **true**.
+Para ler os dados de uma tabela vamos utilizar o método **findAll**, que também requer o model (no nosso caso o User). Os dados vem em um objeto especial, para transformar em um array de objetos temos que inserir um parâmetro, que é o **raw** como **true**.
 
 ```js
 app.get('/', async(req,res)=>{

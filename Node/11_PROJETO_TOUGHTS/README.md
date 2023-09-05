@@ -407,3 +407,35 @@ onde:
 Para remover os pensamentos, no arquivo **dashboard.handlebars**, temos a linha de código que envia como formulário o id do pensamento em questão, isso é importante para conseguirmos referencia-lo na hora de remover
 - Em **toughtsRoutes.js**, vamos criar uma rota do tipo post para o "/remove" chamando a função removeTought
 - Agora em **ToughtsController.js**, vamos criar a função removeTought
+
+## Editando pensamentos
+Para editar, primeiro vamos exibir os pensamentos no formulário de edição antes de dar um update
+
+- Primeiro, precisamos criar uma rota get dinamica dentro do **ToughtsRoutes.js**, chamando a função updateTought. 
+- Agora, dentro do **ToughtsController.js**, vamos criar a função updateTought
+- Vamos resgatar os dados do banco de dados e mandar para o arquivo '/views/toughts/edit.handlebars'
+
+Agora, para atualizar os dados dentro do banco de dados, vamos:
+- Criar uma rota do tipo post dentro do arquivo **toughtsRoutes.js**, chamando a função updateToughtSave
+- Dentro do aruqivo **ToughtsController.js** vamos criar a função updateToughtSave com o seguinte código:
+```js
+const id = req.body.id
+const userId = req.session.userid;
+const toughts = {
+    title: req.body.title
+};
+await Tought.update(toughts,{where:{id:id}, userId: userId})
+res.redirect('dashboard')
+```
+## Resgatando os pensamentos para o Home
+Para resgatar todos os pensamentos para a home, vamos usar a rota raiz ja criada usando a função **showToughts** do **ToughtsController.js**
+```js
+await Tought.findAll({include: User}).then((data)=>{
+    const toughts = data.map((value)=>{
+        return value.get({plain:true})
+    })
+    res.render('toughts/home',{toughts})
+}).catch((err)=>{
+    console.log(err)
+})
+```
