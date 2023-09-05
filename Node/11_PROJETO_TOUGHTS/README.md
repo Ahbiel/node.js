@@ -377,3 +377,33 @@ Agora, para inserir os pensamentos no banco de dados, vamos:
 - Vamos criar a função createToughtSave dentro do arquivo **ToughtsController.js**
  - Dentro dessa função, vamos passar os pensamentos com o **UserId** igual ao id do usuário que está logado (req.session.userid)
  - Vamos armazenar o pensamento com o comando **tought.create()**
+
+Podemos ainda Resgatar esses pensamentos, seguindo os seguintes passos:
+- vamos configurar a função dashboard dentro do arquivo **ToughtsController.js**
+```js
+    const userId = req.session.userid;
+    const user = await User.findOne({
+        where:{id:userId},
+        include: Tought, //tráz todos os pensamentos do usuário
+        plain: true
+    })
+    if(!user){
+        res.redirect('/login')
+    }
+    console.log(user.Toughts)
+    // const toughts = user.Toughts.map((result)=>{
+    //     console.log(result.dataValues)
+    // })
+    const toughts = user.Toughts.map((result)=>result.dataValues)
+    res.render('toughts/dashboard', {toughts})
+```
+onde: 
+- **const userId = req.session.userid;:** Aqui, o código está obtendo o ID do usuário a partir do objeto de sessão da solicitação HTTP
+- **const user = await User.findOne({ where: { id: userId }, include: Tought, plain: true }):** Este trecho de código está fazendo uma consulta ao banco de dados usando o modelo User. Ele está procurando um usuário com o ID userId especificado e incluindo os dados relacionados aos "Toughts" (pensamentos) do usuário. O plain: true significa que você deseja apenas os dados brutos do usuário, em vez de um objeto complexo. A consulta é feita de forma assíncrona usando await.
+- **if (!user) { res.redirect('/login') }:** Aqui, o código verifica se a consulta ao banco de dados encontrou um usuário com o ID fornecido. Se não encontrou, ele redireciona o cliente para a página de login.
+- **const toughts = user.Toughts.map((result) => result.dataValues):** Aqui, o código está mapeando os "Toughts" do usuário para uma matriz chamada toughts. Ele está acessando os dados brutos de cada "Tought" usando result.dataValues e armazenando-os na matriz.
+
+## Removendo pensamentos.
+Para remover os pensamentos, no arquivo **dashboard.handlebars**, temos a linha de código que envia como formulário o id do pensamento em questão, isso é importante para conseguirmos referencia-lo na hora de remover
+- Em **toughtsRoutes.js**, vamos criar uma rota do tipo post para o "/remove" chamando a função removeTought
+- Agora em **ToughtsController.js**, vamos criar a função removeTought

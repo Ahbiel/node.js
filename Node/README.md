@@ -472,7 +472,7 @@ systemctl status mysql.service # Visualiza se o serviço está mesmo ativo
 sudo mysql -u root # Estabelece uma conexão com o MySql
 
 # Uma vez logado
-ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Ab123456';
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Ab12345*';
 CREATE DATABASE nodeapp;
 SHOW DATABASES
 ```
