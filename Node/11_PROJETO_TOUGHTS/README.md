@@ -439,3 +439,25 @@ await Tought.findAll({include: User}).then((data)=>{
     console.log(err)
 })
 ```
+
+## Criando funcionalidade de Busca
+
+Dentro do arquivo **home.handlebars**, vamos criar a seguinte linha de código:
+```handlebars
+<form action="/" method="GET">
+    <input type="text" name="search" placeholder="Está buscando por algo?">
+    <input type="submit" class="btn" value="Buscar">
+</form>
+```
+E, como esse formulário está com a rota pra raiz do site vamos configurar essa funcionalidade dentro da função **showToughts** dentro do arquivo **ToughtsController.js**. O formulário está armazenando o valor dentro da url, onde, preciso resgatar esse valor através do **req.query**.
+
+Para criarmos esse filtro, vamos precisar importar a seguinte biblioteca
+```js
+import { Op } from 'sequelize'
+```
+- A importação de { Op } permite que você use operadores Sequelize em consultas, como where e find, para definir condições mais avançadas. Por exemplo, você pode usar o operador $eq para verificar se um valor é igual a outro, o operador $gt para verificar se um valor é maior que outro, e assim por diante.
+
+Agora, vamos editar a chamada da função **findAll**
+```js
+
+```

@@ -1,5 +1,7 @@
 import Tought from '../models/Tought.js'
 import User from '../models/User.js'
+import { Op } from 'sequelize'
+
 
 export default class ToughtsController {
     static async showToughts(req,res) {
@@ -10,11 +12,30 @@ export default class ToughtsController {
         // const toughts = toughtsData.map((result)=>result.get({plain:true}))
         // res.render('toughts/home',{toughts})
 
-        await Tought.findAll({include: User}).then((data)=>{
+        let search = ''
+        if(req.query.search){
+            search = req.query.search
+        }
+
+        let order = 'DESC'
+        if(req.query,order === 'old'){
+            order = "ASC"
+        } else{
+            order = 'DESC'
+        }
+
+        await Tought.findAll({include: User, where:{
+            title: {[Op.like]: `%${search}%`},
+            order: [['createAt',order]]
+        }}).then((data)=>{
             const toughts = data.map((value)=>{
                 return value.get({plain:true})
             })
-            res.render('toughts/home',{toughts})
+            const toughtsQty = toughts.length
+            if(toughtsQty === 0){
+                toughtsQty = false
+            }
+            res.render('toughts/home',{toughts, search,toughtsQty})
         }).catch((err)=>{
             console.log(err)
         })
