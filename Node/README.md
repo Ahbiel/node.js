@@ -1135,3 +1135,62 @@ MVC significa "Model-View-Controller" (Modelo-Visão-Controlador), que é um pad
     - TaskController.js
   - Vou criar as rotas e logo em seguida exportar
   - No index.js, vamos dar um express.use() e usar as rotas criadas
+
+# Seção 14 - APIs
+
+**O que é uma Api?**
+
+API é uma sigla que significa "Application Programming Interface" em inglês, ou "Interface de Programação de Aplicativos" em português. Uma API é um conjunto de regras e protocolos que permitem que diferentes componentes de software se comuniquem uns com os outros. Ela define as maneiras pelas quais programas de computador devem interagir, compartilhar dados e funcionar em conjunto. Não necessita de telas, poruqe as respostas geralmente são em **JSON**. Independente do front-end, a API não possui ligação com o front e são baseadas em requisição e resposta.
+
+Podemos criar uma API com Express!
+
+## O que é REST e RESTful?
+REST (Representational State Transfer) é um estilo de arquitetura de software que foi introduzido por Roy Fielding em sua tese de doutorado em 2000. O REST é um conjunto de princípios e restrições de design que são usados para criar sistemas web escaláveis, simples e interoperáveis. Ele se tornou amplamente adotado na criação de APIs (Interfaces de Programação de Aplicativos) para serviços web devido à sua simplicidade e eficácia.
+
+RESTful é um termo que descreve a conformidade com os princípios do REST na criação de APIs e serviços web. Quando uma API é considerada RESTful, isso significa que ela segue as práticas e convenções do REST, como a utilização de URIs para identificar recursos e os verbos HTTP para operar nesses recursos. Além disso, uma API RESTful deve ser stateless e utilizar representações de dados padronizadas, como JSON ou XML, para a comunicação entre o cliente e o servidor.
+
+Para os princípios do REST, acesse esse link: https://www.ibm.com/topics/rest-apis
+
+## O que é SPA?
+SPA (Single Page Application) é um tipo de aplicativo web que interage com os usuários fornecendo uma experiência de usuário mais fluida e responsiva. A principal característica de uma SPA é que ela carrega uma única página HTML e, em seguida, atualiza dinamicamente o conteúdo dessa página à medida que o usuário interage com o aplicativo, em vez de carregar páginas HTML separadas para cada ação ou navegação.
+
+Uma SPA carrega o código JavaScript e os recursos necessários apenas uma vez no início da sessão do usuário. Depois disso, as interações do usuário são tratadas de forma assíncrona por meio de chamadas à **API**, sem a necessidade de carregar páginas HTML adicionais.
+
+As SPAs frequentemente fazem uso intensivo de APIs (Interfaces de Programação de Aplicativos) para buscar dados do servidor e atualizar a interface do usuário dinamicamente. Isso cria uma forte ligação entre SPAs e APIs. A ligação entre SPAs e APIs é fundamental para o funcionamento de uma SPA. A API fornece os dados e recursos necessários para que a SPA funcione corretamente. Quando um usuário interage com uma SPA, como ao clicar em um botão ou preencher um formulário, a SPA geralmente faz solicitações assíncronas para a API para buscar ou enviar dados.
+
+## Verbos http
+
+Os verbos HTTP são métodos que definem as ações que podem ser executadas em recursos (como URLs) em uma arquitetura REST (Representational State Transfer). Cada verbo HTTP tem um significado específico e é usado para realizar operações distintas em um recurso
+
+Os principais verbos http são:
+- **GET:** O verbo GET é usado para recuperar informações de um recurso. Quando um cliente envia uma solicitação GET para um recurso, o servidor retorna os dados desse recurso. Solicitações GET para o mesmo recurso não devem causar mudanças no estado do servidor.
+- **POST:** O verbo POST é usado para criar um novo recurso no servidor. Quando um cliente envia uma solicitação POST, geralmente inclui dados que serão usados para criar o recurso.
+- **PUT:** O verbo PUT é usado para atualizar um recurso ou criar um recurso se ele não existir. Quando um cliente envia uma solicitação PUT, ela contém os dados completos do recurso, que substituirão o recurso existente ou criarão um novo. 
+- **PATCH:** O verbo PATCH é usado para atualizar _parcialmente_ um recurso, em vez de substituí-lo inteiramente como o PUT. Um cliente envia uma solicitação PATCH com os dados que deseja modificar no recurso, e o servidor aplica essas alterações ao recurso existente (o PATCH é mais recomendado do que o PUT dependendo da aplicação).
+- **DELETE:** O verbo DELETE é usado para excluir um recurso do servidor. Quando um cliente envia uma solicitação DELETE, o servidor remove o recurso especificado. 
+- **OPTIONS:** O verbo OPTIONS é usado para obter informações sobre os métodos HTTP suportados por um recurso. Isso pode incluir detalhes sobre os cabeçalhos aceitáveis, métodos permitidos e outras informações relevantes sobre o recurso.
+- **HEAD:** O verbo HEAD é semelhante ao GET, mas não retorna o corpo da resposta. É usado para obter informações sobre o recurso, como cabeçalhos de resposta e status, sem a necessidade de recuperar o corpo da resposta.
+- **CONNECT:** O verbo CONNECT é usado para estabelecer uma conexão de rede com um recurso, geralmente para configurar uma comunicação segura, como o uso de um túnel SSL/TLS.
+- **TRACE:** O verbo TRACE é usado para diagnosticar problemas de rede. Ele retorna uma mensagem de eco contendo informações sobre como a solicitação foi manipulada pelo servidor. É geralmente usado para depuração.
+
+## Criando a Primeira API
+
+Para criarmos a api, vamos utilizar apenas o express criando uma rota que responde em JSON (esse é o dado de comunicação entre aplicação e API)
+
+```js
+import express from 'express'
+const app = express()
+const port = 3000
+app.use(
+    express.urlencoded({
+        extended:true
+    })
+)
+app.use(express.json())
+
+//rotas - endpoint
+app.get('/',(req,res)=>{
+    res.json({message: 'Primeira rota criada com sucesso!!'})
+})
+app.listen(port)
+```

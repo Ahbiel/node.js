@@ -459,5 +459,21 @@ import { Op } from 'sequelize'
 
 Agora, vamos editar a chamada da função **findAll**
 ```js
-
+ await Tought.findAll({include: User, where:{
+    title: {[Op.like]: `%${search}%`},
+    order: [['createAt',order]]
+}}).then((data)=>{
+    const toughts = data.map((value)=>{
+        return value.get({plain:true})
+    })
+    const toughtsQty = toughts.length
+    if(toughtsQty === 0){
+        toughtsQty = false
+    }
+    res.render('toughts/home',{toughts, search,toughtsQty})
+}).catch((err)=>{
+    console.log(err)
+})
 ```
+- [Op.like]: Isso é uma referência ao operador Sequelize Op.like, que é usado para realizar uma pesquisa semelhante (comparação de padrões) no campo title.
+- %${search}%: Aqui, % é um caractere curinga que corresponde a zero ou mais caracteres em uma busca SQL. O ${search} é uma interpolação de string que substitui ${search} pelo valor da variável search. Isso cria uma consulta SQL que procura registros em que o campo title contenha o valor da variável search em qualquer posição do título, devido ao uso de % no início e no final da string de busca.

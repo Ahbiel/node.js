@@ -26,8 +26,7 @@ export default class ToughtsController {
 
         await Tought.findAll({include: User, where:{
             title: {[Op.like]: `%${search}%`},
-            order: [['createAt',order]]
-        }}).then((data)=>{
+        }, order: [['createdAt', order]], }).then((data)=>{
             const toughts = data.map((value)=>{
                 return value.get({plain:true})
             })
