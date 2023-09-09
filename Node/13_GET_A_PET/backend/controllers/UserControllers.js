@@ -1,6 +1,8 @@
 import createUserToken from '../helpers/create-user-token.js'
 import User from '../models/User.js'
 import bcrypt from 'bcrypt'
+import getToken from '../helpers/get-token.js'
+import jwt from "jsonwebtoken";
 
 export default class UserController{
     static async register(req,res){
@@ -76,5 +78,44 @@ export default class UserController{
             return
         }
         await createUserToken(user, req,res)
+    }
+    static async checkUser(req,res){
+        let currentUser;
+        console.log(req.headers.authorization)
+        if(req.headers.authorization){
+            const token = getToken(req) // "pega o token"
+            const decoded = jwt.verify(token, "nossosecret")
+            currentUser = await User.findOne(
+                {where:{id: decoded.id},
+                attributes: {exclude: ['password']}
+            })
+            // currentUser.password = undefined
+        }else{
+            currentUser = null
+        }
+        res.status(200).send(currentUser)
+    }
+    static async getUserById(req,res){
+        const id = req.params.id
+        const user = await User.findOne({
+            where:{id:id},
+            attributes: {exclude: ['password']}
+        })
+        if(!user){
+            res.status(422).json({
+                message: "Usuário não encontrado"
+            })
+            return; 
+        }
+        res.status(200).json({
+            user
+        })
+    }
+    static async editUser(req,res){
+        const id = req.params.id
+        res.status(200).json({
+            message: `Deu certo o retorno!!, id do user: ${id}`
+        })
+        return
     }
 }

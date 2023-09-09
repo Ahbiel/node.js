@@ -108,3 +108,87 @@ Após a configuração, vamos chamar essa função nos seguintes arquivos:
 ## Criando função de login no sistema
 
 Vamos criar uma nova rota dentro do **UserRoutes.js** chamando a função login dentro do arquivo **UserControllers.js**, fazendo a verificação de se existe o email passado dentro do banco de dados e a senha descriptografada
+
+## Verificando usuário pelo token
+
+Primeiro, no arquivo **UserRoutes.js** vamos criar uma rota para o '/checkuser' chamando a função **checkUser** do arquivo **UserControllers.js**. E, dentro dessa função, vamos colocar o seguintes código:
+```js
+static async checkUser(req,res){
+    let currentUser;
+    console.log(req.headers.authorization)
+    if(req.headers.authorization){
+        const token = getToken(req) // "pega o token"
+        const decoded = jwt.verify(token, "nossosecret") // descriptografa o token com a chave que passamos no arquvo **create-user-token.js**
+        currentUser = await User.findOne(
+            {where:{id: decoded.id},
+            attributes: {exclude: ['password']}
+        })
+        // currentUser.password = undefined
+    }else{
+        currentUser = null
+    }
+    res.status(200).send(currentUser)
+}
+```
+Após isso, vamos criar um helper para conseguir pegar apenas a chave token. esse arquivo será o **get-token.js** e terá o seguinte bloco de código:
+
+```js
+const getToken = (req) => {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1]; //Esta linha verifica se authHeader não é nulo ou indefinido (usando o operador &&) e, se não for, divide o valor de authHeader em um array usando o espaço em branco como delimitador (usando split(" "))
+    return token;
+}
+export default getToken;
+```
+
+Para testarmos, dentro o postman, podemos criar uma request com o metodo get para a rota **http://localhost:5000/users/checkuser**, ir em **Authorization** e depois em **Bearer Token**, e mandar a chave token através da requisição get. E assim, teremos acesso as informações do usuário com base no token dele
+
+## Fazendo a atualização do usuário
+
+Para isso, vamos dividir em - partes
+- Primeiro, vamos resgatar o usuário pelo id
+  - Vamos criar uma rota com o id dinâmico do usuário dentro do arquivo **UserRoutes.js** chamando a função getUserById dentro do arquivo **UserControllers.js**
+  - Dentro da função, vamos pegar o id pelo parâmetro, e resgatar no banco de dados.
+  - No postman, vamos criar outro request e passar a rota como **http://localhost:3000/users/{id}**
+- Agora, vamos verificar o Token do usuário
+  - Vamos criar uma rota com verificação de token. Vamos criar uma rota com o método **patch** chamando a função editUser do arquivo **UserControllers.js** passando o seguinte caminho: '/edit/:id'.
+    - Vamos criar o arquivo **verify-token.js** como helper
+    - Vamos criar uma funçãom como middleware para a validação do token.
+    - Vamos passar esse bloco de comando:
+    - Depois, vamos importa-lo dentro do arquivo **UserRoutes.js** e chamar antes da função editUser
+    - dentro do postman, vamos criar outro request chamando essa rota com um determinado ID sem autenticação
+```js
+// verify-token.js
+import jwt from "jsonwebtoken";
+import getToken from "./get-token.js";
+
+// middleware to validate token
+const checkToken = (req,res,next) => {
+    const token = getToken(req) //pega o token
+    console.log(token)
+    if(!req.headers.authorization){
+        return res.status(401).json({
+            message: "Acesso Negado!"
+        })
+    }
+    if(!token){
+        return res.status(401).json({
+            message: "Acesso Negado!"
+        })
+    }
+    try {
+        const verify = jwt.verify(token,"nossosecret");
+        req.user = verify //atribui o resultado da verificação à propriedade user do objeto req
+        next()
+    } catch (error) {
+        return res.status(401).json({
+            message: "Token inválido!"
+        })
+    }
+}
+export default checkToken
+
+// UserRoutes.js
+router.patch('/edit/:id', checkToken,UserController.editUser)    
+```
+  
