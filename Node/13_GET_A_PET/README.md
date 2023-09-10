@@ -156,7 +156,7 @@ Para isso, vamos dividir em - partes
     - Vamos criar uma funçãom como middleware para a validação do token.
     - Vamos passar esse bloco de comando:
     - Depois, vamos importa-lo dentro do arquivo **UserRoutes.js** e chamar antes da função editUser
-    - dentro do postman, vamos criar outro request chamando essa rota com um determinado ID sem autenticação
+    - dentro do postman, vamos criar outro request chamando essa rota com um determinado ID sem autenticação e com autenticação
 ```js
 // verify-token.js
 import jwt from "jsonwebtoken";
@@ -191,4 +191,79 @@ export default checkToken
 // UserRoutes.js
 router.patch('/edit/:id', checkToken,UserController.editUser)    
 ```
-  
+- Agora, vamos iniciar a validação por usuário
+  - A primeira coisa que vamos fazer, é dentro da função **editUser** do arquivo **Usercontrollers.js**, vamos usar a função **get-token.js** e armazenar em uma variável chamada token.
+  - Vamos criar outro helper chamado **get-user_by_token.js** para selecionar o usuário com base nas informações do token e retornar para o userControllers as informações do usuário.
+  - Vamos fazer todas as validações e prosseguir
+- Finalizando atualizações
+  - Após todas as configurações, vamos usar o metodo update do sequelize para atualizar os seviços dentro do banco de dados, passando todos os dados da variável user.
+
+## Upload de images
+
+Para ajudar, vamos criar outro helper chamado **image-upload.js**.
+```js
+import multer from "multer";
+import path from "path";
+
+// Destination to store image
+const imageStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    let folder = "";
+
+    console.log(req)
+
+    if (req.baseUrl.includes('users')) {
+      folder = "users";
+    } else if (req.baseUrl.includes('pets')) {
+      folder = "pets";
+    }
+    cb(null, `public/images/${folder}/`);
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const imageUpload = multer({
+  storage: imageStorage,
+  fileFilter(req, file, cb) {
+    if (!file.originalname.match(/\.(png|jpg)$/)) {
+      // upload only png and jpg format
+      return cb(new Error("Por favor, envie apenas png ou jpg!"));
+    }
+    cb(undefined, true);
+  },
+});
+
+export default imageUpload
+```
+onde:
+- **multer**: é um middleware Node.js usado para processar uploads de arquivos.
+- **path**: é um módulo Node.js que fornece utilitários para trabalhar com caminhos de arquivo.
+**imageStorage**: é uma configuração de armazenamento para o multer.diskStorage. Isso define onde os arquivos enviados devem ser armazenados no servidor e como eles devem ser nomeados.
+  - **destination:** É uma função que determina a pasta de destino para o armazenamento dos arquivos. A função verifica a URL base da solicitação (req.baseUrl) para decidir se os arquivos devem ser armazenados em uma pasta "users" ou "pets". A pasta de destino é definida com base na URL.
+    - **cb** é uma função de callback fornecida pelo multer para controlar onde e como os arquivos enviados são armazenados.
+    - **null** é o primeiro argumento passado para a função cb, indicando que não houve erros durante o processamento.
+    - A **string public/images/${folder}/** é o caminho para o diretório de destino onde o arquivo enviado será armazenado. O diretório é construído dinamicamente com base no valor da variável folder.
+  - **filename:** É uma função que determina como o arquivo deve ser nomeado. Neste caso, o nome do arquivo é definido como o carimbo de data e hora atual (em milissegundos) concatenado com a extensão original do arquivo.
+- **imageUpload** é uma instância do middleware multer, que é configurada com base nas opções definidas em imageStorage.
+  - **storage:** É definido como imageStorage, que especifica onde e como os arquivos serão armazenados.
+  - **fileFilter:** É uma função que filtra os arquivos que podem ser enviados. Neste caso, ele permite apenas arquivos com extensão .png ou .jpg. Se um arquivo com uma extensão diferente for enviado, ele retornará um erro.
+  - cb(undefined, true): Assim como no exemplo anterior, cb é uma função de callback fornecida pelo multer.
+    - **undefined** é o primeiro argumento passado para a função cb, indicando que não houve erros durante o processo de filtragem.
+    - **true** é o segundo argumento passado para a função cb, indicando que o arquivo enviado deve ser aceito e processado
+Este middleware pode ser usado em suas rotas para processar o upload de imagens da seguinte maneira:
+```js
+router.patch('/edit/:id', checkToken, imageUpload.single('image'),UserController.editUser)
+```
+Neste exemplo, a rota "/edit/:id" usa o middleware imageUpload.single("image") para processar o upload de uma única imagem com o nome de campo "imagem". O arquivo carregado estará disponível em req.file para processamento adicional.
+
+Todos os arquivos são salvos dentro do req.file, ou seja, para acessarmos, precisamos da seguinte linha de comando dentro da função **editUser** no arquivo **UserControllers.js**
+```js
+if(req.file){
+    user.image = req.file.filename
+}
+```
+onde: 
+- **if (req.file):** Esta linha verifica se a propriedade req.file está definida na requisição. Em muitos casos, quando você usa o middleware multer (como no exemplo anterior), os arquivos enviados pelo cliente são armazenados em req.file.
+- **user.image = req.file.filename**: Se a condição do if for verdadeira (ou seja, um arquivo foi enviado), este trecho de código atribui o nome do arquivo carregado (req.file.filename) ao campo image do objeto user. Presumivelmente, o objeto user é uma representação de um usuário em sua aplicação, e você está atualizando o campo image com o nome do arquivo da imagem que o usuário enviou.
