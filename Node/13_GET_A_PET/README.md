@@ -267,3 +267,62 @@ if(req.file){
 onde: 
 - **if (req.file):** Esta linha verifica se a propriedade req.file está definida na requisição. Em muitos casos, quando você usa o middleware multer (como no exemplo anterior), os arquivos enviados pelo cliente são armazenados em req.file.
 - **user.image = req.file.filename**: Se a condição do if for verdadeira (ou seja, um arquivo foi enviado), este trecho de código atribui o nome do arquivo carregado (req.file.filename) ao campo image do objeto user. Presumivelmente, o objeto user é uma representação de um usuário em sua aplicação, e você está atualizando o campo image com o nome do arquivo da imagem que o usuário enviou.
+
+# Iniciando rotas com pets
+
+Primeiro, vamos começar criando um arquivo de **PetRoutes.js** no arquivo de rotas. Vamos criar uma rota para o '/create' e logo em seguida vamos criar o arquivo **PetsController.js**. Dentro desse arquivo, vamos importar o Module Pets e iniciar a configuração. Após isso, vamos importar o **PetRoutes.js** dentro do **index.js** e criar uma rota usando o middleware.
+
+No module **Pets.js**, vamos colocar as seguintes linhas de comando:
+```js
+Pet.belongsTo(User)
+User.hasMany(Pet)
+```
+
+## Salvando pets no sistema
+
+Dentro do arquivo **PetRoutes.js**, vamos importar o middleware **verify-token** para garantir que o usuário só salve alguma foto no sistema se ele estiver autenticado.
+
+Agora, dentro da função create do **PetController.js** vamos chamar os helpers **get-token.js** para conseguir pegar o token através da requisição, e depois vamos chamar o **get-user-by-token.js** para resgatar o usuário através do token passado. Vamos criar um objeto com todos esses dados e depois salvar no banco de dados.
+
+## Upload de multiplas images
+
+Primeiro, dentro do arquivo **PetRoutes.js**, vou chamar o arquivo de helper **image-upload.js** dentro da rota, dessa maneira:
+```js
+router.post('/create', verifyToken, imageUpload.array('images'), PetController.create)
+```
+Onde o **.array** serve para indicar que poderei mandar mais de uma imagem para o servidor
+
+Agora no arquivo **PetController.js**, vamos cnfigurar as seguintes linhas de comando a mais:
+```js
+const images = req.files //recebe as images 
+//------------------------------------------------------------------------------------------------
+images.map((image)=>{
+    pet.images.push(image.filename)
+}) //Pega todas as images e adciona no objeto pet com base na quantidade de images
+```
+
+Agora, no arquivo **image-upload.js** vamos precisar fazer uma pequena modificação:
+```js
+filename: (req, file, cb) => {
+    cb(null,
+       Date.now() + 
+       String(Math.floor(Math.random()*100)) + 
+       path.extname(file.originalname)); 
+       //deixar o nome único com valores aleatórios, data e o nome do arquivo
+},
+```
+Vamos adicionar o **String(Math.floor(Math.random()*100))** para gerar um número aleatório e impedir que as imagens tenham o mesmo nome.
+
+## Função para resgatar os pets
+
+Primeiro, vamos criar uma rota para o '/' chamando a função getall para poder resgatar todos os pets de todos os usuário e mostrar para todos (uma rota pública).
+
+E, para resgatar pets de usuários especificos, precisamos pegar os dados do usuário através do token, e buscar as informações com base no UserId
+
+Agora, para mostrar todos os pets adotados, vamos apenas criar a função **getAllUserAdoptions**, mas a implementação será feita posteriormente.
+
+Podemos também resgatar o pet pelo id, e para isso, vamos usar o id dinamico pelo url e resgatar com base nesse ID
+
+## Removendo um pet do sistema
+
+Primeiro, vamos criar uma rota com o metodo de 'delete', com uma url de id dinamico chamando a função **removePetById** dentro do **PetController.js**. Agora, dentro dessa função, vamos resgatar o id passado pelo url e o usuário atraves do token. Nas validações, vamos verificar se existe um pet com aquele determinado id, e verificar se o UserId daquele pet condiz com o Id do usuário resgatado pelo token, se condiz, podemos deleter o pet.

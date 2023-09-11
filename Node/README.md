@@ -827,6 +827,16 @@ app.get('/', async(req,res)=>{
 })
 ```
 
+Ainda temos alguns métodos que podemos trabalhar junto com o findAll, como por exemplo:
+- A possibilidade de order os dados com base no createdAt ou updatedAt
+```js
+static async getAll(req,res){
+    const pets = await Pet.findAll({
+        order: [['createdAt','DESC']] //'DESC' para ordenação decrescente ou 'ASC' para ordenação crescente
+    })
+}
+```
+
 ## Utilizando o WHERE
 
 Para filtrar dados com o Sequelize utilizando o WHERE, precisamos inserir um novo parâmetro, que será o where, um objeto onde colocamos a propriedades e valores que queremos filtrar. E para retornar apenas um resultado podemos utilizar o método findOne. 
@@ -845,6 +855,15 @@ app.get('/users/:id', async(req,res)=>{
         catch((err)=>console.log(err))
 })
 ```
+Temos ainda a possibilidade de excluir uma determinada coluna dentro da tabela, com o método exclude:
+```js
+const currentUser = await User.findOne(
+    {where:{id:id},
+    attributes: {exclude: ['password']}
+})
+```
+Nesse exemplo, estou buscando os dados dentro do User e armazenando dentro da varivável currentUser, porém, o campo com o nome de 'password' não será incluido dentro da variável criado
+
 
 ## Removendo itens
 Para remover itens utilizando o método **destroy** juntamente com o **where**.

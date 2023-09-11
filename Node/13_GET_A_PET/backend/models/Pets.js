@@ -1,33 +1,40 @@
 //-----------------------------------------------step 4 -------------------------------------------
-import conn from '../db/conn'
+import conn from '../db/conn.js'
+import User from './User.js'
 import { DataTypes } from 'sequelize'
 
 const Pet = conn.define('Pet',{
     name:{
         type: DataTypes.STRING,
-        required: true
+        allowNull: false
     },
     age:{
-        type: DataTypes.NUMBER,
-        required: true
+        type: DataTypes.INTEGER,
+        allowNull: false
     },
     weight:{
-        type: DataTypes.NUMBER,
-        required: true
+        type: DataTypes.INTEGER,
+        allowNull: false
     },
     color:{
         type: DataTypes.STRING,
-        required: true
+        allowNull: false
     },
-    images:{
-        type: DataTypes.ARRAY,
-        required: true
+    images: {
+        type: DataTypes.JSON,
+        allowNull: false,
     },
     available:{
         type: DataTypes.BOOLEAN,
     },
-    user: Object,
-    adopter: Object
+    user: {
+        type: DataTypes.JSON,
+        allowNull: false,
+    }
+    // adopter: Object
 })
+
+Pet.belongsTo(User)
+User.hasMany(Pet)
 
 export default Pet;
