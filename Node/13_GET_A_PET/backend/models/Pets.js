@@ -30,8 +30,10 @@ const Pet = conn.define('Pet',{
     user: {
         type: DataTypes.JSON,
         allowNull: false,
-    }
-    // adopter: Object
+    },
+    adopter: {
+        type: DataTypes.JSON,
+    },
 })
 
 Pet.belongsTo(User)

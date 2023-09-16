@@ -7,11 +7,7 @@ export default class PetController{
     static async create(req,res){
         const {name, age, weight, color} = req.body;
         const images = req.files
-        // console.log(images,'AHHHHHHHHHH')
         const available = true;
-        //images upload
-
-        // validations
         if(!name){
             res.status(422).json({message: "O nome é obrigatório"})
             return
@@ -115,6 +111,7 @@ export default class PetController{
         const pet = await Pet.findOne({where:{id:id}})
         if(!pet){
             res.status(404).json({message: 'Pet não encontrado'})
+            return
         }
         //verificar se o usuário logado registrou o pet
         const token = getToken(req);
@@ -129,5 +126,126 @@ export default class PetController{
         }).then(()=>{
             res.status(200).json({message: 'Pet removido com sucesso!'})
         })
+    }
+    static async updatePet(req,res){
+        const id = req.params.id
+        const {name, age, weight, color, available} = req.body;
+        const images = req.files
+        const updatedData = {}
+
+        const pet = await Pet.findOne({where:{id:id}})
+        if(!pet){
+            res.status(422).json({message: 'Pet não encontrado'})
+            return
+        }
+        //verificar se o usuário logado registrou o pet
+        const token = getToken(req);
+        const user = await getUserByToken(res,token)
+        console.log(pet.UserId)
+        if(pet.UserId.toString() !== user.id.toString()){
+            res.status(422).json({message: 'Houve um erro ao processar sua solicitação'})
+            return
+        }
+
+        if(!name){
+            res.status(422).json({message: "O nome é obrigatório"})
+            return
+        } else {
+            updatedData.name = name
+        }
+        if(!age){
+            res.status(422).json({message: "A idade é obrigatório"})
+            return
+        } else {
+            updatedData.age = age
+        }
+        if(!weight){
+            res.status(422).json({message: "O peso é obrigatório"})
+            return
+        } else {
+            updatedData.weight = weight
+        }
+        if(!color){
+            res.status(422).json({message: "A cor é obrigatório"})
+            return
+        } else {
+            updatedData.color = color
+        }
+        if(images.length === 0){
+            res.status(422).json({message: "A imagem é obrigatório"})
+            return
+        } else {
+            console.log('updatedData')
+            updatedData.images = []
+            images.map((image)=>{
+                updatedData.images.push(image.filename)
+            })
+        }
+        
+        await Pet.update(updatedData,{
+            where:{id:id}
+        })
+    }
+    static async schedule(req,res){
+        const id = req.params.id
+        const pet = await Pet.findOne({where:{id:id}, raw:true})
+        if(!pet){
+            res.status(422).json({message: 'Pet não encontrado'})
+            return
+        }
+        //verificar se o usuário logado registrou o pet
+        const token = getToken(req);
+        const user = await getUserByToken(res,token)
+        if(pet.UserId.toString() === user.id.toString()){
+            res.status(422).json({message: 'Você não pode adotar o seu próprio pet'})
+            return
+        }
+        console.log(pet)
+        if(pet.adopter){
+            console.log('test')
+            if(pet.adopter.id.toString() === user.id.toString()){
+                res.status(422).json({message: 'Você já agendou uma visita para este pet'})
+                return
+            } else{
+                res.status(422).json({message: 'Esse pet já possui uma visita agendada'})
+            }
+        }
+        // add user to pet
+        pet.adopter = {
+            id: user.id,
+            name: user.name,
+            image: user.image
+        }
+        console.log(pet)
+        await Pet.update(pet,{
+            where:{id}
+        }).then(()=>{
+            res.status(200).json({
+                message: `A visita foi agendada com sucesso, entre em contato com ${pet.user.name} pelo telefone ${pet.user.phone}`
+            })
+        }).catch((err)=>console.log(err))
+    }
+    static async concludeAdoption(req,res){
+        const id = req.params.id;
+        const pet = await Pet.findOne({where:{id:id}, raw:true})
+        if(!pet){
+            res.status(422).json({message: 'Pet não encontrado'})
+            return
+        }
+        const token = getToken(req)
+        const user = await getUserByToken(req,token)
+        if(pet.UserId.toString() !== user.id.toString()){
+            res.status(422).json({message: 'Você precisa ser dono desse pet para aceitar'})
+            return
+        }
+        pet.available = false
+
+        await Pet.update(pet,{
+            where:{id}
+        }).then(()=>{
+            res.status(200).json({
+                message: `A adoção foi realizada com sucesso`
+            })
+        }).catch((err)=>console.log(err))
     }
 }

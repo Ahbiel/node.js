@@ -326,3 +326,22 @@ Podemos também resgatar o pet pelo id, e para isso, vamos usar o id dinamico pe
 ## Removendo um pet do sistema
 
 Primeiro, vamos criar uma rota com o metodo de 'delete', com uma url de id dinamico chamando a função **removePetById** dentro do **PetController.js**. Agora, dentro dessa função, vamos resgatar o id passado pelo url e o usuário atraves do token. Nas validações, vamos verificar se existe um pet com aquele determinado id, e verificar se o UserId daquele pet condiz com o Id do usuário resgatado pelo token, se condiz, podemos deleter o pet.
+
+## Atualizando o pet
+
+Vamos criar uma rota do tipo patch com o id dinamico dentro do arquivo **PetRoutes.js** chamando a função updatePet dentro do **PetController.js**, então, vamos fazer todas as validações e atualizar dentro do banco de dados
+
+## Agendando visitas de adoção
+
+Vamos criar uma rota do tipo patch com o id dinamico dentro do arquivo **PetRoutes.js** chamando a função schedule dentro do **PetController.js**, então, vamos fazer todas as validações e atualizar dentro do banco de dados
+
+Dentro dessa função, vamos:
+- Verificar se o pet existe
+- Verificar se o dono do pet não esta tentando agendar uma visita com o próprio pet
+- Verificar se o pet já tem uma visita agendada
+- Adcionar as informações do usuário que quer adotar o pet
+- atualizar o sistema
+
+## Concluindo a adoção do pet
+
+Vamos criar uma função chamada concludeAdoption dentro do **PetController.js**, resgatar o pet, verificar se o usuário que está aceitando é o dono do pet, e depois vamos confirmar a adoção
