@@ -7,7 +7,7 @@ const app = express()
 //config JSON response (no need urlencoded, data will be only in json)
 app.use(express.json())
 // Solve CORS - allows the API to access this route without issue
-app.use(cors({ credentials: true, origin: 'http://localhost:3000' })) //Porta frontend
+app.use(cors({ credentials: true, origin: 'http://localhost:5173' })) //Porta frontend
 
 //public folder for images
 app.use(express.static('public'))
