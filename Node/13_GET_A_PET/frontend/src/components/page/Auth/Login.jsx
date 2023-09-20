@@ -5,14 +5,22 @@ import { Context } from "../../../context/UserContext.jsx";
 import { Link } from "react-router-dom";
 
 export default function Login() {
+  const [user,setUser] = useState({})
+  const {login} = useContext(Context)
+
   const handleChange = (e) =>{
-    
+    setUser({...user,[e.target.name]: e.target.value})
+    console.log(user)
+  }
+  const handleSumit = (e) =>{
+    e.preventDefault()
+    login(user)
   }
   
   return (
     <section className="form_container">
       <h1>Login</h1>
-      <form>
+      <form onSubmit={handleSumit}>
         <Input
           text="E-mail"
           type="email"
